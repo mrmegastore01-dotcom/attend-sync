@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attendance — AttendSync</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    
+    :root{--primary:#3525cd;--primary-container:#4f46e5;--on-primary:#fff;--secondary-container:#b6b4ff;--background:#f9f9ff;--surface:#f9f9ff;--surface-lowest:#fff;--surface-low:#eff3ff;--surface-high:#dee9fd;--on-surface:#121c2a;--on-surface-variant:#4a5568;--shadow-tinted:rgba(18,28,42,0.06);--sidebar-w:260px;--header-h:68px;--present-bg:#e8f5e9;--present-fg:#2e7d32;--absent-bg:#fce4ec;--absent-fg:#c62828;--leave-bg:#fff3e0;--leave-fg:#ef6c00}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--background);color:var(--on-surface);min-height:100vh;display:flex;flex-direction:column}
+    .app-shell{display:flex;flex:1}
+    .main-content{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-width:0}
+    .page-body{flex:1;padding:2rem;overflow-y:auto}
+
+    /* Controls bar */
+    .controls-bar{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;background:var(--surface-lowest);padding:1rem 1.25rem;border-radius:0.875rem;border:1px solid rgba(199,196,216,0.2);box-shadow:0 2px 8px var(--shadow-tinted)}
+    .controls-bar label{font-size:0.8125rem;font-weight:600;color:var(--on-surface-variant);white-space:nowrap}
+    .date-input{padding:0.5rem 0.875rem;border-radius:0.625rem;border:1.5px solid rgba(199,196,216,0.6);background:var(--surface-low);font-size:0.875rem;font-family:inherit;color:var(--on-surface);outline:none;transition:border-color 0.2s}
+    .date-input:focus{border-color:var(--primary)}
+    .btn{padding:0.625rem 1.25rem;border-radius:0.625rem;font-size:0.875rem;font-weight:600;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:0.5rem;transition:opacity 0.15s,transform 0.15s}
+    .btn:hover:not(:disabled){opacity:0.88;transform:translateY(-1px)}
+    .btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-ghost{background:var(--surface-low);color:var(--on-surface-variant)}
+    .btn svg{width:16px;height:16px}
+    .spacer{flex:1}
+    .info-badge{font-size:0.8125rem;color:var(--on-surface-variant);background:var(--surface-low);padding:0.4rem 0.875rem;border-radius:99px;white-space:nowrap}
+
+    /* Table card */
+    .table-card{background:var(--surface-lowest);border-radius:1rem;border:1px solid rgba(199,196,216,0.2);box-shadow:0 2px 8px var(--shadow-tinted);overflow:hidden;animation:fadeUp 0.4s ease both}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse}
+    th{padding:0.75rem 1.25rem;text-align:left;font-size:0.75rem;font-weight:700;color:var(--on-surface-variant);text-transform:uppercase;letter-spacing:0.07em;background:var(--surface-low);border-bottom:1px solid rgba(199,196,216,0.2)}
+    td{padding:0.75rem 1.25rem;font-size:0.875rem;border-bottom:1px solid rgba(199,196,216,0.1);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+
+    /* Status selector */
+    .status-group{display:flex;gap:0.375rem;flex-wrap:wrap}
+    .status-btn{padding:0.3rem 0.75rem;border-radius:99px;border:2px solid transparent;font-size:0.75rem;font-weight:600;cursor:pointer;background:var(--surface-low);color:var(--on-surface-variant);transition:all 0.15s;font-family:inherit}
+    .status-btn:hover{opacity:0.8}
+    .status-btn.sel-Present{background:var(--present-bg);color:var(--present-fg);border-color:var(--present-fg)}
+    .status-btn.sel-Absent{background:var(--absent-bg);color:var(--absent-fg);border-color:var(--absent-fg)}
+    .status-btn.sel-Leave{background:var(--leave-bg);color:var(--leave-fg);border-color:var(--leave-fg)}
+
+    /* Time inputs */
+    .time-input{padding:0.375rem 0.625rem;border-radius:0.5rem;border:1.5px solid rgba(199,196,216,0.6);background:var(--surface-low);font-size:0.8125rem;font-family:inherit;color:var(--on-surface);outline:none;width:110px;transition:border-color 0.2s}
+    .time-input:focus{border-color:var(--primary)}
+
+    /* Saved row */
+    tr.saved-row td{background:rgba(46,125,50,0.04)}
+
+    /* Avatar */
+    .avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary-container));color:#fff;font-weight:700;font-size:0.75rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .name-cell{display:flex;align-items:center;gap:0.625rem}
+
+    .empty-state{padding:3rem;text-align:center;color:var(--on-surface-variant);font-size:0.875rem}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:900px){.main-content{margin-left:0}}
+
+    /* ===== MOBILE FIXES ===== */
+
+@media (max-width: 900px) {
+  #sidebarContainer {
+    display: none;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .info-badge {
+    text-align: center;
+  }
+
+  th, td {
+    white-space: nowrap;
+  }
+
+  .time-input {
+    width: 100%;
+  }
+}
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <div id="sidebarContainer"></div>
+  <div class="main-content">
+    <div id="headerContainer"></div>
+    <div class="page-body">
+
+      <!-- Controls -->
+      <div class="controls-bar">
+        <label>Date:</label>
+        <input class="date-input" id="dateInput" type="date" onchange="loadAttendance()" />
+        <div class="spacer"></div>
+        <span class="info-badge" id="markedBadge">Loading…</span>
+        <button class="btn btn-ghost" id="markAllPresentBtn" onclick="markAll('Present')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Mark All Present
+        </button>
+        <button class="btn btn-primary" id="saveAllBtn" onclick="saveAll()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          <span id="saveAllText">Save All</span>
+        </button>
+      </div>
+
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Staff Member</th>
+                <th>Department</th>
+                <th>Status</th>
+                <th>Check-In</th>
+                <th>Check-Out</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="attBody">
+              <tr><td colspan="7" class="empty-state">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+    <div id="footerContainer"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script src="app.js"></script>
+<script>
+  injectSharedCSS();
+  const sb = getSupabase();
+  let staffList    = [];
+  let existingMap  = {}; // staffId → existing attendance record
+
+  (async () => {
+    const session = await requireAuth();
+    if (!session) return;
+    document.getElementById('sidebarContainer').innerHTML = renderSidebar('attendance', session.user.email);
+    document.getElementById('headerContainer').innerHTML  = renderHeader('Attendance', 'Mark daily attendance for your team');
+    document.getElementById('footerContainer').innerHTML  = renderFooter();
+
+    // Set default date to today
+    document.getElementById('dateInput').value = todayISO();
+    await fetchStaff();
+    await loadAttendance();
+  })();
+
+  async function fetchStaff() {
+    const { data, error } = await sb.from('staff').select('id, name, department, role').order('name');
+    if (error) { showToast('Failed to load staff: ' + error.message, 'error'); return; }
+    staffList = data || [];
+  }
+
+  async function loadAttendance() {
+    const date = document.getElementById('dateInput').value;
+    if (!date) return;
+
+    document.getElementById('attBody').innerHTML = `<tr><td colspan="7" class="empty-state">Loading…</td></tr>`;
+
+    try {
+      // Fetch existing records for selected date
+      const { data: existing, error } = await sb
+        .from('attendance')
+        .select('*')
+        .eq('date', date);
+      if (error) throw error;
+
+      // Build map: staff_id → record
+      existingMap = {};
+      (existing || []).forEach(r => { existingMap[r.staff_id] = r; });
+
+      renderAttTable(date);
+      updateBadge();
+    } catch (err) {
+      showToast('Error loading attendance: ' + err.message, 'error');
+    }
+  }
+
+  function renderAttTable(date) {
+    const body = document.getElementById('attBody');
+    if (!staffList.length) {
+      body.innerHTML = `<tr><td colspan="7" class="empty-state">No staff found. <a href="staff.html" style="color:var(--primary)">Add staff first</a>.</td></tr>`;
+      return;
+    }
+
+    body.innerHTML = staffList.map((s, i) => {
+      const rec    = existingMap[s.id];
+      const status = rec?.status  || '';
+      const cin    = rec?.check_in  || '';
+      const cout   = rec?.check_out || '';
+      const notes  = rec?.notes     || '';
+
+      return `<tr id="row-${s.id}" class="${rec ? 'saved-row' : ''}">
+        <td style="color:var(--on-surface-variant);font-weight:500">${i+1}</td>
+        <td>
+          <div class="name-cell">
+            <div class="avatar">${s.name[0].toUpperCase()}</div>
+            <div>
+              <div style="font-weight:600">${s.name}</div>
+              <div style="font-size:0.75rem;color:var(--on-surface-variant)">${s.role || ''}</div>
+            </div>
+          </div>
+        </td>
+        <td>${s.department || '—'}</td>
+        <td>
+          <div class="status-group">
+            ${['Present','Absent','Leave'].map(st => `
+              <button class="status-btn ${status === st ? 'sel-'+st : ''}"
+                      onclick="setStatus('${s.id}','${st}',this)">${st}</button>
+            `).join('')}
+          </div>
+        </td>
+        <td><input class="time-input" id="cin-${s.id}" type="time" value="${cin}" /></td>
+        <td><input class="time-input" id="cout-${s.id}" type="time" value="${cout}" /></td>
+        <td><input class="time-input" id="notes-${s.id}" type="text" value="${notes}" placeholder="Optional" style="width:130px"/></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function setStatus(staffId, status, btn) {
+  const row = btn.closest('tr');
+
+  // Clear previous selection
+  row.querySelectorAll('.status-btn').forEach(b => {
+    b.className = 'status-btn';
+  });
+
+  btn.className = `status-btn sel-${status}`;
+
+  // ✅ AUTO CHECK-IN when Present is selected
+  if (status === 'Present') {
+    const now = new Date();
+
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+
+    const time = `${hours}:${minutes}`;
+
+    const cinInput = row.querySelector(`#cin-${staffId}`);
+
+    // Only set if empty (don’t overwrite manual edits)
+    if (cinInput && !cinInput.value) {
+      cinInput.value = time;
+    }
+  }
+
+  updateBadge();
+}
+
+  function getRowData(staffId) {
+    const row    = document.getElementById(`row-${staffId}`);
+    const selBtn = row.querySelector('.status-btn[class*="sel-"]');
+    return {
+      status:    selBtn ? selBtn.textContent.trim() : null,
+      check_in:  document.getElementById(`cin-${staffId}`).value   || null,
+      check_out: document.getElementById(`cout-${staffId}`).value  || null,
+      notes:     document.getElementById(`notes-${staffId}`).value || null,
+    };
+  }
+
+  function updateBadge() {
+    const marked = staffList.filter(s => {
+      const row    = document.getElementById(`row-${s.id}`);
+      if (!row) return false;
+      return !!row.querySelector('.status-btn[class*="sel-"]');
+    }).length;
+    document.getElementById('markedBadge').textContent = `${marked} / ${staffList.length} marked`;
+  }
+
+  function markAll(status) {
+    staffList.forEach(s => {
+      const row = document.getElementById(`row-${s.id}`);
+      if (!row) return;
+      row.querySelectorAll('.status-btn').forEach(b => b.className = 'status-btn');
+      const target = row.querySelector(`.status-btn:nth-child(${status==='Present'?1:status==='Absent'?2:3})`);
+      if (target) target.className = `status-btn sel-${status}`;
+    });
+    updateBadge();
+  }
+
+  async function saveAll() {
+    const date   = document.getElementById('dateInput').value;
+    const saveBtn = document.getElementById('saveAllBtn');
+    const saveText = document.getElementById('saveAllText');
+
+    if (!date) { showToast('Please select a date.', 'error'); return; }
+
+    const toUpsert = [];
+    const toSkip   = [];
+
+    staffList.forEach(s => {
+      const { status, check_in, check_out, notes } = getRowData(s.id);
+      if (!status) { toSkip.push(s.name); return; }
+
+      const record = { staff_id: s.id, date, status, check_in, check_out, notes };
+      
+      // remove this:if (existingMap[s.id]) record.id = existingMap[s.id].id;
+      toUpsert.push(record);
+    });
+
+    if (!toUpsert.length) {
+      showToast('No attendance marked. Please set status for at least one staff member.', 'error');
+      return;
+    }
+
+    saveBtn.disabled = true;
+    saveText.textContent = 'Saving…';
+
+    try {
+      // Upsert (insert or update) — Supabase handles conflict on (staff_id, date) if unique constraint set
+      const { error } = await sb.from('attendance').upsert(toUpsert, {
+        onConflict: 'staff_id,date',
+        ignoreDuplicates: false,
+      });
+      if (error) throw error;
+
+      showToast(`Attendance saved for ${toUpsert.length} staff member(s)!`);
+      await loadAttendance(); // refresh to mark saved rows
+    } catch (err) {
+      showToast('Error saving attendance: ' + err.message, 'error');
+    } finally {
+      saveBtn.disabled = false;
+      saveText.textContent = 'Save All';
+    }
+  }
+</script>
+</body>
+</html>

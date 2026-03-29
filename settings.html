@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings — AttendSync</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root{--primary:#3525cd;--primary-container:#4f46e5;--on-primary:#fff;--secondary-container:#b6b4ff;--background:#f9f9ff;--surface:#f9f9ff;--surface-lowest:#fff;--surface-low:#eff3ff;--surface-high:#dee9fd;--on-surface:#121c2a;--on-surface-variant:#4a5568;--shadow-tinted:rgba(18,28,42,0.06);--sidebar-w:260px;--header-h:68px;--error:#c0392b}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--background);color:var(--on-surface);min-height:100vh;display:flex;flex-direction:column}
+    .app-shell{display:flex;flex:1}
+    .main-content{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-width:0}
+    .page-body{flex:1;padding:2rem;overflow-y:auto;max-width:760px}
+
+    .section-card{background:var(--surface-lowest);border-radius:1rem;border:1px solid rgba(199,196,216,0.2);box-shadow:0 2px 8px var(--shadow-tinted);margin-bottom:1.5rem;overflow:hidden;animation:fadeUp 0.4s ease both}
+    .section-card:nth-child(2){animation-delay:0.05s}.section-card:nth-child(3){animation-delay:0.1s}
+    .section-head{padding:1.25rem 1.5rem;border-bottom:1px solid rgba(199,196,216,0.2);background:var(--surface-low)}
+    .section-head h2{font-family:'Manrope',sans-serif;font-weight:700;font-size:1rem;color:var(--on-surface);margin-bottom:0.2rem}
+    .section-head p{font-size:0.8125rem;color:var(--on-surface-variant)}
+    .section-body{padding:1.5rem}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    .form-group{display:flex;flex-direction:column;gap:0.375rem}
+    .form-group.full{grid-column:1/-1}
+    label{font-size:0.8125rem;font-weight:600;color:var(--on-surface)}
+    .form-input{padding:0.625rem 0.875rem;border-radius:0.625rem;border:1.5px solid rgba(199,196,216,0.6);background:var(--surface-low);font-size:0.875rem;font-family:inherit;color:var(--on-surface);outline:none;transition:border-color 0.2s;width:100%}
+    .form-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(53,37,205,0.08);background:var(--surface-lowest)}
+    .form-input:disabled{opacity:0.6;cursor:not-allowed}
+    .btn{padding:0.625rem 1.25rem;border-radius:0.625rem;font-size:0.875rem;font-weight:600;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:0.5rem;transition:opacity 0.15s,transform 0.15s}
+    .btn:hover:not(:disabled){opacity:0.88;transform:translateY(-1px)}
+    .btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-danger{background:#fce4ec;color:#c62828}
+    .btn svg{width:16px;height:16px}
+    .form-footer{display:flex;gap:0.75rem;margin-top:1.25rem;justify-content:flex-end}
+    .hint{font-size:0.75rem;color:var(--on-surface-variant);margin-top:0.25rem}
+
+    /* Config table */
+    .config-table{width:100%;border-collapse:collapse}
+    .config-table tr{border-bottom:1px solid rgba(199,196,216,0.15)}
+    .config-table tr:last-child{border-bottom:none}
+    .config-table td{padding:0.875rem 0;font-size:0.875rem}
+    .config-table td:first-child{color:var(--on-surface-variant);font-weight:500;width:40%}
+    .config-table td:last-child{color:var(--on-surface);font-family:monospace;font-size:0.8125rem}
+    .pill{display:inline-block;padding:0.2rem 0.625rem;border-radius:99px;font-size:0.75rem;font-weight:600}
+    .pill-green{background:#e8f5e9;color:#2e7d32}
+    .pill-orange{background:#fff3e0;color:#ef6c00}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:900px){.main-content{margin-left:0}.form-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <div id="sidebarContainer"></div>
+  <div class="main-content">
+    <div id="headerContainer"></div>
+    <div class="page-body">
+
+      <!-- Profile / Password -->
+      <div class="section-card">
+        <div class="section-head">
+          <h2>Admin Account</h2>
+          <p>Update your password and account settings</p>
+        </div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label>Email address</label>
+              <input class="form-input" id="adminEmail" type="email" disabled />
+              <span class="hint">Email cannot be changed from this interface.</span>
+            </div>
+            <div class="form-group">
+              <label>New Password</label>
+              <input class="form-input" id="newPassword" type="password" placeholder="Min 8 characters" />
+            </div>
+            <div class="form-group">
+              <label>Confirm New Password</label>
+              <input class="form-input" id="confirmPassword" type="password" placeholder="Re-enter password" />
+            </div>
+          </div>
+          <div class="form-footer">
+            <button class="btn btn-primary" id="updatePwBtn" onclick="updatePassword()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Update Password
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Supabase connection info -->
+      <div class="section-card">
+        <div class="section-head">
+          <h2>Supabase Connection</h2>
+          <p>Database and authentication configuration</p>
+        </div>
+        <div class="section-body">
+          <table class="config-table">
+            <tr>
+              <td>Project URL</td>
+              <td id="cfgUrl">—</td>
+            </tr>
+            <tr>
+              <td>Auth Status</td>
+              <td><span class="pill pill-green" id="cfgAuth">Checking…</span></td>
+            </tr>
+            <tr>
+              <td>User ID</td>
+              <td id="cfgUserId">—</td>
+            </tr>
+            <tr>
+              <td>Session Expires</td>
+              <td id="cfgExpiry">—</td>
+            </tr>
+          </table>
+          <div style="margin-top:1.25rem">
+            <p style="font-size:0.8125rem;color:var(--on-surface-variant)">
+              To update Supabase credentials, edit <code style="background:var(--surface-low);padding:0.15rem 0.4rem;border-radius:4px;font-size:0.8125rem">supabase-config.js</code>.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Database setup guide -->
+      <div class="section-card">
+        <div class="section-head">
+          <h2>Database Setup</h2>
+          <p>Required Supabase tables — run these SQL statements in your Supabase SQL editor</p>
+        </div>
+        <div class="section-body">
+          <pre style="background:var(--on-surface);color:#e2e8f0;padding:1.25rem;border-radius:0.75rem;font-size:0.8125rem;overflow-x:auto;line-height:1.7">-- ── staff table
+CREATE TABLE staff (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name        text NOT NULL,
+  email       text UNIQUE NOT NULL,
+  phone       text,
+  department  text,
+  role        text,
+  joined_date date,
+  created_at  timestamptz DEFAULT now()
+);
+
+-- ── attendance table
+CREATE TABLE attendance (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  staff_id    uuid NOT NULL REFERENCES staff(id) ON DELETE CASCADE,
+  date        date NOT NULL,
+  status      text NOT NULL CHECK (status IN ('Present','Absent','Leave')),
+  check_in    time,
+  check_out   time,
+  notes       text,
+  created_at  timestamptz DEFAULT now(),
+  UNIQUE(staff_id, date)
+);
+
+-- ── RLS policies (enable RLS in Supabase dashboard first)
+ALTER TABLE staff      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE attendance ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Authenticated users can read staff"
+  ON staff FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Authenticated users can manage staff"
+  ON staff FOR ALL TO authenticated USING (true);
+
+CREATE POLICY "Authenticated users can read attendance"
+  ON attendance FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Authenticated users can manage attendance"
+  ON attendance FOR ALL TO authenticated USING (true);</pre>
+        </div>
+      </div>
+
+      <!-- Danger zone -->
+      <div class="section-card">
+        <div class="section-head">
+          <h2>Session</h2>
+          <p>Manage your current session</p>
+        </div>
+        <div class="section-body">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+            <div>
+              <div style="font-size:0.875rem;font-weight:600;color:var(--on-surface);margin-bottom:0.25rem">Sign Out</div>
+              <div style="font-size:0.8125rem;color:var(--on-surface-variant)">You will be redirected to the login page.</div>
+            </div>
+            <button class="btn btn-danger" onclick="signOut()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div id="footerContainer"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script src="app.js"></script>
+<script>
+  injectSharedCSS();
+  const sb = getSupabase();
+
+  (async () => {
+    const session = await requireAuth();
+    if (!session) return;
+    document.getElementById('sidebarContainer').innerHTML = renderSidebar('settings', session.user.email);
+    document.getElementById('headerContainer').innerHTML  = renderHeader('Settings', 'Account, connection and system configuration');
+    document.getElementById('footerContainer').innerHTML  = renderFooter();
+
+    // Populate fields
+    document.getElementById('adminEmail').value = session.user.email || '';
+    document.getElementById('cfgUrl').textContent    = window.__SUPA_URL || '—';
+    document.getElementById('cfgAuth').textContent   = 'Authenticated';
+    document.getElementById('cfgUserId').textContent = session.user.id || '—';
+    document.getElementById('cfgExpiry').textContent = session.expires_at
+      ? new Date(session.expires_at * 1000).toLocaleString()
+      : '—';
+  })();
+
+  async function updatePassword() {
+    const newPw  = document.getElementById('newPassword').value;
+    const confPw = document.getElementById('confirmPassword').value;
+
+    if (!newPw)           { showToast('Please enter a new password.', 'error'); return; }
+    if (newPw.length < 8) { showToast('Password must be at least 8 characters.', 'error'); return; }
+    if (newPw !== confPw) { showToast('Passwords do not match.', 'error'); return; }
+
+    const btn = document.getElementById('updatePwBtn');
+    btn.disabled = true;
+    try {
+      const { error } = await sb.auth.updateUser({ password: newPw });
+      if (error) throw error;
+      showToast('Password updated successfully!');
+      document.getElementById('newPassword').value     = '';
+      document.getElementById('confirmPassword').value = '';
+    } catch (err) {
+      showToast('Error updating password: ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>

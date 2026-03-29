@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reports — AttendSync</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root{--primary:#3525cd;--primary-container:#4f46e5;--on-primary:#fff;--secondary-container:#b6b4ff;--background:#f9f9ff;--surface:#f9f9ff;--surface-lowest:#fff;--surface-low:#eff3ff;--surface-high:#dee9fd;--on-surface:#121c2a;--on-surface-variant:#4a5568;--shadow-tinted:rgba(18,28,42,0.06);--sidebar-w:260px;--header-h:68px;--present-bg:#e8f5e9;--present-fg:#2e7d32;--absent-bg:#fce4ec;--absent-fg:#c62828;--leave-bg:#fff3e0;--leave-fg:#ef6c00}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--background);color:var(--on-surface);min-height:100vh;display:flex;flex-direction:column}
+    .app-shell{display:flex;flex:1}
+    .main-content{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-width:0}
+    .page-body{flex:1;padding:2rem;overflow-y:auto}
+
+    /* Filter card */
+    .filter-card{background:var(--surface-lowest);border-radius:1rem;border:1px solid rgba(199,196,216,0.2);box-shadow:0 2px 8px var(--shadow-tinted);padding:1.5rem;margin-bottom:1.5rem;animation:fadeUp 0.4s ease both}
+    .filter-grid{display:grid;grid-template-columns:1fr 1fr 1fr auto auto;gap:1rem;align-items:end;flex-wrap:wrap}
+    .filter-group{display:flex;flex-direction:column;gap:0.375rem}
+    label{font-size:0.8125rem;font-weight:600;color:var(--on-surface-variant)}
+    .form-input{padding:0.625rem 0.875rem;border-radius:0.625rem;border:1.5px solid rgba(199,196,216,0.6);background:var(--surface-low);font-size:0.875rem;font-family:inherit;color:var(--on-surface);outline:none;transition:border-color 0.2s;width:100%}
+    .form-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(53,37,205,0.08)}
+    .btn{padding:0.625rem 1.25rem;border-radius:0.625rem;font-size:0.875rem;font-weight:600;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:0.5rem;transition:opacity 0.15s,transform 0.15s;white-space:nowrap}
+    .btn:hover:not(:disabled){opacity:0.88;transform:translateY(-1px)}
+    .btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-ghost{background:var(--surface-low);color:var(--on-surface-variant)}
+    .btn-green{background:#2e7d32;color:#fff}
+    .btn svg{width:16px;height:16px}
+
+    /* Summary chips */
+    .summary-row{display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}
+    .chip{padding:0.625rem 1.25rem;border-radius:0.75rem;font-size:0.875rem;font-weight:600;display:flex;align-items:center;gap:0.5rem}
+    .chip-total{background:var(--surface-high);color:var(--on-surface)}
+    .chip-present{background:var(--present-bg);color:var(--present-fg)}
+    .chip-absent{background:var(--absent-bg);color:var(--absent-fg)}
+    .chip-leave{background:var(--leave-bg);color:var(--leave-fg)}
+
+    /* Table card */
+    .table-card{background:var(--surface-lowest);border-radius:1rem;border:1px solid rgba(199,196,216,0.2);box-shadow:0 2px 8px var(--shadow-tinted);overflow:hidden;animation:fadeUp 0.4s 0.1s ease both}
+    .table-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid rgba(199,196,216,0.2)}
+    .table-title{font-family:'Manrope',sans-serif;font-weight:700;font-size:1rem;color:var(--on-surface)}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse}
+    th{padding:0.75rem 1.25rem;text-align:left;font-size:0.75rem;font-weight:700;color:var(--on-surface-variant);text-transform:uppercase;letter-spacing:0.07em;background:var(--surface-low);border-bottom:1px solid rgba(199,196,216,0.2)}
+    td{padding:0.875rem 1.25rem;font-size:0.875rem;border-bottom:1px solid rgba(199,196,216,0.1);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:var(--surface-low)}
+    .badge{display:inline-flex;align-items:center;padding:0.2rem 0.625rem;border-radius:99px;font-size:0.75rem;font-weight:600}
+    .badge.Present{background:var(--present-bg);color:var(--present-fg)}
+    .badge.Absent{background:var(--absent-bg);color:var(--absent-fg)}
+    .badge.Leave{background:var(--leave-bg);color:var(--leave-fg)}
+    .empty-state{padding:3rem;text-align:center;color:var(--on-surface-variant);font-size:0.875rem}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:900px){.main-content{margin-left:0}.filter-grid{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <div id="sidebarContainer"></div>
+  <div class="main-content">
+    <div id="headerContainer"></div>
+    <div class="page-body">
+
+      <!-- Filters -->
+      <div class="filter-card">
+        <div class="filter-grid">
+          <div class="filter-group">
+            <label>From Date</label>
+            <input class="form-input" id="fromDate" type="date" />
+          </div>
+          <div class="filter-group">
+            <label>To Date</label>
+            <input class="form-input" id="toDate" type="date" />
+          </div>
+          <div class="filter-group">
+            <label>Staff Member</label>
+            <select class="form-input" id="staffFilter">
+              <option value="">All Staff</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Status</label>
+            <select class="form-input" id="statusFilter">
+              <option value="">All Statuses</option>
+              <option value="Present">Present</option>
+              <option value="Absent">Absent</option>
+              <option value="Leave">Leave</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="fetchReport()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Generate
+          </button>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="summary-row" id="summaryRow" style="display:none">
+        <div class="chip chip-total" id="chipTotal">Total: 0</div>
+        <div class="chip chip-present" id="chipPresent">Present: 0</div>
+        <div class="chip chip-absent" id="chipAbsent">Absent: 0</div>
+        <div class="chip chip-leave" id="chipLeave">Leave: 0</div>
+      </div>
+
+      <!-- Results table -->
+      <div class="table-card">
+        <div class="table-header">
+          <span class="table-title" id="tableTitle">Attendance Report</span>
+          <button class="btn btn-green" id="exportBtn" onclick="exportCSV()" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export CSV
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Staff Name</th>
+                <th>Department</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Check-In</th>
+                <th>Check-Out</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="reportBody">
+              <tr><td colspan="8" class="empty-state">Set filters above and click "Generate" to view the report.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+    <div id="footerContainer"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script src="app.js"></script>
+<script>
+  injectSharedCSS();
+  const sb = getSupabase();
+  let reportData = [];
+
+  (async () => {
+    const session = await requireAuth();
+    if (!session) return;
+    document.getElementById('sidebarContainer').innerHTML = renderSidebar('reports', session.user.email);
+    document.getElementById('headerContainer').innerHTML  = renderHeader('Reports', 'Filter and export attendance records');
+    document.getElementById('footerContainer').innerHTML  = renderFooter();
+
+    // Default date range: current month
+    const now  = new Date();
+    const y    = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0');
+    document.getElementById('fromDate').value = `${y}-${m}-01`;
+    document.getElementById('toDate').value   = todayISO();
+
+    await loadStaffOptions();
+  })();
+
+  async function loadStaffOptions() {
+    const { data } = await sb.from('staff').select('id, name').order('name');
+    const sel = document.getElementById('staffFilter');
+    (data || []).forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id; opt.textContent = s.name;
+      sel.appendChild(opt);
+    });
+  }
+
+  async function fetchReport() {
+    const from   = document.getElementById('fromDate').value;
+    const to     = document.getElementById('toDate').value;
+    const staff  = document.getElementById('staffFilter').value;
+    const status = document.getElementById('statusFilter').value;
+
+    if (!from || !to) { showToast('Please select a date range.', 'error'); return; }
+    if (from > to)    { showToast('From date must be before To date.', 'error'); return; }
+
+    const body = document.getElementById('reportBody');
+    body.innerHTML = `<tr><td colspan="8" class="empty-state">Loading…</td></tr>`;
+    document.getElementById('exportBtn').style.display = 'none';
+    document.getElementById('summaryRow').style.display = 'none';
+
+    try {
+      let query = sb
+        .from('attendance')
+        .select('*, staff(name, department)')
+        .gte('date', from)
+        .lte('date', to)
+        .order('date', { ascending: false });
+
+      if (staff)  query = query.eq('staff_id', staff);
+      if (status) query = query.eq('status', status);
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      reportData = data || [];
+      renderReport();
+    } catch (err) {
+      showToast('Error generating report: ' + err.message, 'error');
+      body.innerHTML = `<tr><td colspan="8" class="empty-state">Failed to load report.</td></tr>`;
+    }
+  }
+
+  function renderReport() {
+    const body = document.getElementById('reportBody');
+
+    if (!reportData.length) {
+      body.innerHTML = `<tr><td colspan="8" class="empty-state">No records found for the selected filters.</td></tr>`;
+      document.getElementById('tableTitle').textContent = 'Attendance Report (0 records)';
+      return;
+    }
+
+    // Summary
+    const total   = reportData.length;
+    const present = reportData.filter(r => r.status === 'Present').length;
+    const absent  = reportData.filter(r => r.status === 'Absent').length;
+    const leave   = reportData.filter(r => r.status === 'Leave').length;
+
+    document.getElementById('chipTotal').textContent   = `Total: ${total}`;
+    document.getElementById('chipPresent').textContent = `Present: ${present}`;
+    document.getElementById('chipAbsent').textContent  = `Absent: ${absent}`;
+    document.getElementById('chipLeave').textContent   = `Leave: ${leave}`;
+    document.getElementById('summaryRow').style.display = 'flex';
+    document.getElementById('tableTitle').textContent  = `Attendance Report (${total} records)`;
+    document.getElementById('exportBtn').style.display = 'inline-flex';
+
+    body.innerHTML = reportData.map((r, i) => `
+      <tr>
+        <td style="color:var(--on-surface-variant)">${i+1}</td>
+        <td><strong>${r.staff?.name ?? '—'}</strong></td>
+        <td>${r.staff?.department ?? '—'}</td>
+        <td>${fmtDate(r.date)}</td>
+        <td><span class="badge ${r.status}">${r.status}</span></td>
+        <td>${r.check_in || '—'}</td>
+        <td>${r.check_out || '—'}</td>
+        <td>${r.notes || '—'}</td>
+      </tr>`).join('');
+  }
+
+  function exportCSV() {
+    if (!reportData.length) { showToast('No data to export.', 'error'); return; }
+
+    const headers = ['#','Name','Department','Date','Status','Check-In','Check-Out','Notes'];
+    const rows = reportData.map((r, i) => [
+      i+1,
+      `"${r.staff?.name ?? ''}"`,
+      `"${r.staff?.department ?? ''}"`,
+      r.date,
+      r.status,
+      r.check_in  || '',
+      r.check_out || '',
+      `"${r.notes || ''}"`,
+    ]);
+
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `attendance-report-${document.getElementById('fromDate').value}-to-${document.getElementById('toDate').value}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('CSV exported successfully!');
+  }
+</script>
+</body>
+</html>

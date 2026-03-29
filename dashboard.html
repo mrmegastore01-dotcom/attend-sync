@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — AttendSync</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary:#3525cd; --primary-container:#4f46e5; --on-primary:#fff;
+      --secondary-container:#b6b4ff; --background:#f9f9ff; --surface:#f9f9ff;
+      --surface-lowest:#fff; --surface-low:#eff3ff; --surface-high:#dee9fd;
+      --on-surface:#121c2a; --on-surface-variant:#4a5568;
+      --shadow-tinted:rgba(18,28,42,0.06);
+      --sidebar-w:260px; --header-h:68px;
+      --present-bg:#e8f5e9; --present-fg:#2e7d32;
+      --absent-bg:#fce4ec;  --absent-fg:#c62828;
+      --leave-bg:#fff3e0;   --leave-fg:#ef6c00;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--background);color:var(--on-surface);min-height:100vh;display:flex;flex-direction:column}
+    .app-shell{display:flex;flex:1;min-height:calc(100vh - 52px)}
+    .main-content{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-width:0}
+    .page-body{flex:1;padding:2rem;overflow-y:auto}
+
+    /* Stats grid */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.25rem;margin-bottom:2rem}
+    .stat-card{background:var(--surface-lowest);border-radius:1rem;padding:1.5rem;border:1px solid rgba(199,196,216,0.2);box-shadow:0 2px 8px var(--shadow-tinted);display:flex;align-items:center;gap:1.25rem;transition:transform 0.15s;animation:fadeUp 0.5s ease both}
+    .stat-card:hover{transform:translateY(-2px)}
+    .stat-card:nth-child(1){animation-delay:0.05s}.stat-card:nth-child(2){animation-delay:0.1s}.stat-card:nth-child(3){animation-delay:0.15s}.stat-card:nth-child(4){animation-delay:0.2s}
+    .stat-icon{width:52px;height:52px;border-radius:0.875rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .stat-icon svg{width:24px;height:24px}
+    .stat-icon.blue{background:rgba(53,37,205,0.1);color:var(--primary)}
+    .stat-icon.green{background:var(--present-bg);color:var(--present-fg)}
+    .stat-icon.red{background:var(--absent-bg);color:var(--absent-fg)}
+    .stat-icon.orange{background:var(--leave-bg);color:var(--leave-fg)}
+    .stat-body{flex:1}
+    .stat-label{font-size:0.75rem;font-weight:600;color:var(--on-surface-variant);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.35rem}
+    .stat-value{font-family:'Manrope',sans-serif;font-weight:800;font-size:2rem;letter-spacing:-0.03em;color:var(--on-surface);line-height:1}
+    .stat-sub{font-size:0.75rem;color:var(--on-surface-variant);margin-top:0.3rem}
+
+    /* Recent section */
+    .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+    .section-title{font-family:'Manrope',sans-serif;font-weight:700;font-size:1.05rem;color:var(--on-surface)}
+    .btn-sm{padding:0.45rem 1rem;border-radius:0.5rem;font-size:0.8125rem;font-weight:600;text-decoration:none;cursor:pointer;border:none;font-family:inherit;transition:opacity 0.15s}
+    .btn-sm.primary{background:var(--primary);color:#fff}.btn-sm.primary:hover{opacity:0.88}
+    .btn-sm.ghost{background:var(--surface-low);color:var(--primary)}.btn-sm.ghost:hover{opacity:0.8}
+
+    /* Table */
+    .table-card{background:var(--surface-lowest);border-radius:1rem;border:1px solid rgba(199,196,216,0.2);box-shadow:0 2px 8px var(--shadow-tinted);overflow:hidden;animation:fadeUp 0.5s 0.25s ease both}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse}
+    th{padding:0.75rem 1.25rem;text-align:left;font-size:0.75rem;font-weight:700;color:var(--on-surface-variant);text-transform:uppercase;letter-spacing:0.07em;background:var(--surface-low);border-bottom:1px solid rgba(199,196,216,0.2)}
+    td{padding:0.875rem 1.25rem;font-size:0.875rem;border-bottom:1px solid rgba(199,196,216,0.1);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:var(--surface-low)}
+    .badge{display:inline-flex;align-items:center;gap:0.3rem;padding:0.25rem 0.625rem;border-radius:99px;font-size:0.75rem;font-weight:600}
+    .badge.present{background:var(--present-bg);color:var(--present-fg)}
+    .badge.absent{background:var(--absent-bg);color:var(--absent-fg)}
+    .badge.leave{background:var(--leave-bg);color:var(--leave-fg)}
+
+    /* Two-col layout */
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+
+    /* Empty state */
+    .empty-state{padding:3rem 2rem;text-align:center;color:var(--on-surface-variant);font-size:0.875rem}
+    .skeleton{background:linear-gradient(90deg,var(--surface-low) 25%,var(--surface-high) 50%,var(--surface-low) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:0.5rem;height:1rem;width:80%}
+    @keyframes shimmer{to{background-position:-200% 0}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    @media(max-width:900px){.main-content{margin-left:0}.two-col{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <div id="sidebarContainer"></div>
+  <div class="main-content">
+    <div id="headerContainer"></div>
+    <div class="page-body">
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-label">Total Staff</div>
+            <div class="stat-value" id="statTotal">—</div>
+            <div class="stat-sub">Active employees</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-label">Present Today</div>
+            <div class="stat-value" id="statPresent">—</div>
+            <div class="stat-sub" id="statPresentPct">—</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-label">Absent Today</div>
+            <div class="stat-value" id="statAbsent">—</div>
+            <div class="stat-sub" id="statAbsentPct">—</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon orange">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-label">On Leave Today</div>
+            <div class="stat-value" id="statLeave">—</div>
+            <div class="stat-sub">Approved leaves</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two column -->
+      <div class="two-col">
+        <!-- Recent attendance -->
+        <div>
+          <div class="section-header">
+            <span class="section-title">Today's Attendance</span>
+            <a href="attendance.html" class="btn-sm primary">Mark Attendance</a>
+          </div>
+          <div class="table-card">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Staff</th><th>Status</th><th>Check-in</th></tr></thead>
+                <tbody id="todayAttBody"><tr><td colspan="3" class="empty-state">Loading…</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Staff list preview -->
+        <div>
+          <div class="section-header">
+            <span class="section-title">Staff Overview</span>
+            <a href="staff.html" class="btn-sm ghost">View All</a>
+          </div>
+          <div class="table-card">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Name</th><th>Department</th><th>Role</th></tr></thead>
+                <tbody id="staffPreviewBody"><tr><td colspan="3" class="empty-state">Loading…</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="footerContainer"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script src="app.js"></script>
+<script>
+  injectSharedCSS();
+  const sb = getSupabase();
+
+  (async () => {
+    const session = await requireAuth();
+    if (!session) return;
+
+    document.getElementById('sidebarContainer').innerHTML = renderSidebar('dashboard', session.user.email);
+    document.getElementById('headerContainer').innerHTML  = renderHeader('Dashboard', 'Welcome back — here\'s what\'s happening today');
+    document.getElementById('footerContainer').innerHTML  = renderFooter();
+
+    await loadDashboard();
+  })();
+
+  async function loadDashboard() {
+    const today = todayISO();
+
+    try {
+      // Total staff
+      const { count: total } = await sb.from('staff').select('*', { count: 'exact', head: true });
+
+      // Today's attendance
+      const { data: todayAtt, error: attErr } = await sb
+        .from('attendance')
+        .select('*, staff(name, department)')
+        .eq('date', today);
+      if (attErr) throw attErr;
+
+      const present = todayAtt.filter(r => r.status === 'Present').length;
+      const absent  = todayAtt.filter(r => r.status === 'Absent').length;
+      const leave   = todayAtt.filter(r => r.status === 'Leave').length;
+      const pct     = total ? Math.round((present / total) * 100) : 0;
+
+      document.getElementById('statTotal').textContent   = total ?? 0;
+      document.getElementById('statPresent').textContent = present;
+      document.getElementById('statAbsent').textContent  = absent;
+      document.getElementById('statLeave').textContent   = leave;
+      document.getElementById('statPresentPct').textContent = total ? `${pct}% attendance rate` : 'No data yet';
+      document.getElementById('statAbsentPct').textContent  = total ? `${total - present} not marked present` : '';
+
+      // Today attendance table
+      const attBody = document.getElementById('todayAttBody');
+      if (!todayAtt.length) {
+        attBody.innerHTML = `<tr><td colspan="3" class="empty-state">No attendance marked today</td></tr>`;
+      } else {
+        attBody.innerHTML = todayAtt.slice(0, 8).map(r => `
+          <tr>
+            <td><strong>${r.staff?.name ?? '—'}</strong></td>
+            <td><span class="badge ${r.status.toLowerCase()}">${r.status}</span></td>
+            <td>${r.check_in || '—'}</td>
+          </tr>`).join('');
+      }
+
+      // Staff preview
+      const { data: staffList } = await sb.from('staff').select('name, department, role').limit(6);
+      const staffBody = document.getElementById('staffPreviewBody');
+      if (!staffList?.length) {
+        staffBody.innerHTML = `<tr><td colspan="3" class="empty-state">No staff added yet</td></tr>`;
+      } else {
+        staffBody.innerHTML = staffList.map(s => `
+          <tr>
+            <td><strong>${s.name}</strong></td>
+            <td>${s.department || '—'}</td>
+            <td>${s.role || '—'}</td>
+          </tr>`).join('');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to load dashboard data: ' + (err.message || err), 'error');
+    }
+  }
+</script>
+</body>
+</html>
