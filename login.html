@@ -18,6 +18,8 @@
       --on-surface-variant: #4a5568;
       --shadow-tinted: rgba(18,28,42,0.06);
       --error: #c0392b;
+      --present-bg: #e8f5e9; --present-fg: #2e7d32;
+      --absent-bg: #fce4ec; --absent-fg: #c62828;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -37,7 +39,8 @@
       display: grid; grid-template-columns: 1fr 1fr;
       min-height: calc(100vh - 52px);
     }
-    /* Left Panel */
+
+    /* ── Left Panel ── */
     .left-panel {
       background: var(--surface-low); display: flex; flex-direction: column;
       justify-content: space-between; padding: 3.5rem 4rem;
@@ -67,16 +70,37 @@
     .feature-item { display: flex; align-items: center; gap: 0.875rem; }
     .feature-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 0 4px var(--secondary-container); flex-shrink: 0; }
     .feature-item span { font-size: 0.875rem; color: var(--on-surface-variant); font-weight: 500; }
-    /* Right Panel */
+
+    /* ── Right Panel ── */
     .right-panel { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3.5rem 4rem; background: var(--surface); }
     .login-card {
       background: var(--surface-lowest); border-radius: 1.25rem;
-      padding: 3rem 3.5rem; width: 100%; max-width: 440px;
+      padding: 2.25rem 2.75rem; width: 100%; max-width: 440px;
       box-shadow: 0 40px 80px var(--shadow-tinted), 0 8px 24px rgba(18,28,42,0.04);
       animation: fadeUp 0.6s 0.1s ease both;
     }
-    .card-header { margin-bottom: 2.5rem; }
-    .card-header h2 { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 1.75rem; letter-spacing: -0.03em; color: var(--on-surface); margin-bottom: 0.4rem; }
+
+    /* ── Tabs ── */
+    .tab-bar {
+      display: flex; gap: 0; margin-bottom: 2rem;
+      background: var(--surface-low); border-radius: 0.75rem; padding: 0.25rem;
+    }
+    .tab-btn {
+      flex: 1; padding: 0.625rem 0.5rem; border: none; border-radius: 0.5625rem;
+      font-size: 0.8125rem; font-weight: 600; cursor: pointer; font-family: inherit;
+      background: transparent; color: var(--on-surface-variant);
+      display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+      transition: all 0.2s ease;
+    }
+    .tab-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .tab-btn.active {
+      background: var(--surface-lowest); color: var(--primary);
+      box-shadow: 0 2px 8px rgba(18,28,42,0.08);
+    }
+
+    /* ── Shared form styles ── */
+    .card-header { margin-bottom: 1.75rem; }
+    .card-header h2 { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 1.6rem; letter-spacing: -0.03em; color: var(--on-surface); margin-bottom: 0.4rem; }
     .card-header p { font-size: 0.875rem; color: var(--on-surface-variant); }
     .form-group { margin-bottom: 1.25rem; }
     .form-group label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--on-surface); margin-bottom: 0.5rem; }
@@ -119,36 +143,108 @@
     .sso-note { display: flex; justify-content: center; }
     .sso-note span { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8125rem; color: var(--on-surface-variant); }
     .sso-note svg { width: 14px; height: 14px; }
+
+    /* ── Staff Panel specific ── */
+    .staff-panel { display: none; }
+    .staff-panel.active { display: block; }
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; }
+
+    /* Staff ID input — large, keypad style */
+    .id-input-wrap { position: relative; }
+    .id-input {
+      width: 100%; padding: 1rem 1.25rem;
+      font-size: 2rem; font-weight: 700; letter-spacing: 0.25em;
+      font-family: 'Courier New', monospace;
+      border-radius: 0.75rem; border: 2px solid rgba(199,196,216,0.6);
+      background: var(--surface-low); color: var(--on-surface);
+      outline: none; text-align: center; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .id-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(53,37,205,0.1); background: var(--surface-lowest); }
+    .id-input::placeholder { font-size: 1.5rem; letter-spacing: 0.1em; color: rgba(74,85,104,0.4); }
+
+    /* Staff confirmation screen */
+    .confirm-screen { display: none; }
+    .confirm-screen.show { display: block; }
+    .staff-form-screen { display: block; }
+    .staff-form-screen.hide { display: none; }
+
+    .staff-confirm-card {
+      text-align: center; padding: 0.5rem 0;
+    }
+    .staff-avatar-lg {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-container));
+      color: #fff; font-weight: 800; font-size: 1.75rem;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+      box-shadow: 0 8px 24px rgba(53,37,205,0.25);
+    }
+    .staff-confirm-name { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 1.3rem; color: var(--on-surface); margin-bottom: 0.25rem; }
+    .staff-confirm-dept { font-size: 0.875rem; color: var(--on-surface-variant); margin-bottom: 1.5rem; }
+
+    .status-info-box {
+      background: var(--surface-low); border-radius: 0.875rem;
+      padding: 1rem 1.25rem; margin-bottom: 1.25rem;
+      border: 1px solid rgba(199,196,216,0.3);
+    }
+    .status-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.8125rem; }
+    .status-row + .status-row { margin-top: 0.625rem; padding-top: 0.625rem; border-top: 1px solid rgba(199,196,216,0.3); }
+    .status-label { color: var(--on-surface-variant); font-weight: 500; }
+    .status-value { font-weight: 600; color: var(--on-surface); }
+    .status-value.green { color: var(--present-fg); }
+    .status-value.orange { color: #ef6c00; }
+
+    .btn-checkin {
+      width: 100%; padding: 0.875rem; border-radius: 0.75rem;
+      font-size: 0.9375rem; font-weight: 700; border: none;
+      cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      transition: opacity 0.2s, transform 0.15s;
+      background: linear-gradient(135deg, #1b5e20, #2e7d32); color: #fff;
+    }
+    .btn-checkout {
+      background: linear-gradient(135deg, #bf360c, #e64a19);
+    }
+    .btn-checkin:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+    .btn-checkin:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+    .btn-checkin svg { width: 18px; height: 18px; }
+
+    .btn-back {
+      width: 100%; padding: 0.625rem; border-radius: 0.625rem; border: none;
+      background: none; color: var(--on-surface-variant); font-size: 0.8125rem;
+      font-weight: 500; cursor: pointer; font-family: inherit;
+      margin-top: 0.625rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+      transition: color 0.15s;
+    }
+    .btn-back:hover { color: var(--primary); }
+    .btn-back svg { width: 14px; height: 14px; }
+
+    /* Already done state */
+    .done-banner {
+      background: var(--present-bg); border: 1px solid rgba(46,125,50,0.2);
+      border-radius: 0.875rem; padding: 1rem 1.25rem;
+      display: flex; align-items: center; gap: 0.75rem;
+      color: var(--present-fg); font-size: 0.875rem; font-weight: 600;
+      margin-bottom: 1.25rem;
+    }
+    .done-banner svg { width: 20px; height: 20px; flex-shrink: 0; }
+
     footer { text-align: center; padding: 0.875rem; font-size: 0.75rem; color: var(--on-surface-variant); border-top: 1px solid rgba(199,196,216,0.2); background: var(--surface-lowest); }
     footer strong { color: var(--primary); font-weight: 600; }
+
     @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes spin { to { transform: rotate(360deg); } }
     .left-panel > * { animation: fadeUp 0.55s ease both; }
     .left-panel > *:nth-child(1) { animation-delay: 0.05s; }
     .left-panel > *:nth-child(2) { animation-delay: 0.15s; }
+
     @media (max-width: 900px) {
       .page-wrapper { grid-template-columns: 1fr; }
       .left-panel { display: none; }
       .right-panel { padding: 2.5rem 1.5rem; }
       .login-card { padding: 2.25rem 1.75rem; }
     }
-    /* ===== LOGIN PAGE FIXES ===== */
-
-    /* Ensure the absolutely-positioned icon SVG never escapes its 18x18 box */
-    .input-wrap > svg[width="18"] {
-      position: absolute;
-      right: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      pointer-events: none;
-      flex-shrink: 0;
-    }
-
-    /* Give input text room so it doesn't hide under the icon */
-    .input-wrap .form-input {
-      padding-right: 2.75rem;
-    }
-
     @media (max-width: 480px) {
       .right-panel { padding: 2rem 1.25rem; }
       .login-card  { padding: 2rem 1.5rem; }
@@ -173,7 +269,7 @@
         <p>A premium workspace for tracking attendance, managing staff records, and generating intelligent reports — with precision and ease.</p>
         <div class="feature-list">
           <div class="feature-item"><div class="feature-dot"></div><span>Real-time check-in &amp; check-out tracking</span></div>
-          <div class="feature-item"><div class="feature-dot"></div><span>Staff management with role-based access</span></div>
+          <div class="feature-item"><div class="feature-dot"></div><span>Staff portal with 6-digit ID access</span></div>
           <div class="feature-item"><div class="feature-dot"></div><span>Filtered reports — daily, weekly, monthly</span></div>
           <div class="feature-item"><div class="feature-dot"></div><span>Leave management &amp; approval workflows</span></div>
         </div>
@@ -184,72 +280,184 @@
     <!-- Right Panel -->
     <div class="right-panel">
       <div class="login-card">
-        <div class="card-header">
-          <h2>Welcome back</h2>
-          <p>Sign in to your admin dashboard</p>
+
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+          <button class="tab-btn active" id="tabAdmin" onclick="switchTab('admin')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            Admin Login
+          </button>
+          <button class="tab-btn" id="tabStaff" onclick="switchTab('staff')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Staff Check-In
+          </button>
         </div>
 
-        <div class="error-msg" id="errorMsg">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <span id="errorText">Invalid email or password.</span>
-        </div>
+        <!-- ══════════ ADMIN PANEL ══════════ -->
+        <div class="admin-panel active" id="adminPanel">
+          <div class="card-header">
+            <h2>Welcome back</h2>
+            <p>Sign in to your admin dashboard</p>
+          </div>
 
-        <div class="form-group">
-          <label for="email">Email address</label>
-          <div class="input-wrap">
-            <input id="email" class="form-input" type="email" placeholder="admin@company.com" autocomplete="email" required />
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+          <div class="error-msg" id="adminErrorMsg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span id="adminErrorText">Invalid email or password.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email address</label>
+            <div class="input-wrap">
+              <input id="email" class="form-input" type="email" placeholder="admin@company.com" autocomplete="email" required />
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-wrap">
+              <input id="password" class="form-input" type="password" placeholder="••••••••" autocomplete="current-password" required />
+              <button class="toggle-pw" id="togglePw" type="button" aria-label="Toggle password">
+                <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+            <div class="form-meta"><a href="#" onclick="return false;">Forgot password?</a></div>
+          </div>
+
+          <button class="btn-login" id="loginBtn" type="button">
+            <span class="btn-text">Sign in to dashboard</span>
+            <div class="spinner"></div>
+          </button>
+
+          <div class="divider"><span>secured by</span></div>
+          <div class="sso-note">
+            <span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Supabase Auth — enterprise-grade security
+            </span>
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="password">Password</label>
-          <div class="input-wrap">
-            <input id="password" class="form-input" type="password" placeholder="••••••••" autocomplete="current-password" required />
-            <button class="toggle-pw" id="togglePw" type="button" aria-label="Toggle password">
-              <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-              </svg>
+        <!-- ══════════ STAFF PANEL ══════════ -->
+        <div class="staff-panel" id="staffPanel">
+
+          <!-- Step 1: Enter ID -->
+          <div class="staff-form-screen" id="staffFormScreen">
+            <div class="card-header">
+              <h2>Staff Portal</h2>
+              <p>Enter your 6-digit Staff ID to check in or out</p>
+            </div>
+
+            <div class="error-msg" id="staffErrorMsg">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span id="staffErrorText">Staff ID not found.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="staffIdInput">Staff ID</label>
+              <div class="id-input-wrap">
+                <input
+                  id="staffIdInput"
+                  class="id-input"
+                  type="tel"
+                  maxlength="6"
+                  placeholder="000000"
+                  autocomplete="off"
+                  inputmode="numeric"
+                />
+              </div>
+            </div>
+
+            <button class="btn-login" id="staffLookupBtn" type="button">
+              <span class="btn-text">Continue</span>
+              <div class="spinner"></div>
             </button>
           </div>
-          <div class="form-meta"><a href="#" onclick="return false;">Forgot password?</a></div>
-        </div>
 
-        <button class="btn-login" id="loginBtn" type="button">
-          <span class="btn-text">Sign in to dashboard</span>
-          <div class="spinner"></div>
-        </button>
+          <!-- Step 2: Confirm & Check In/Out -->
+          <div class="confirm-screen" id="staffConfirmScreen">
+            <div class="staff-confirm-card">
+              <div class="staff-avatar-lg" id="confirmAvatar">—</div>
+              <div class="staff-confirm-name" id="confirmName">—</div>
+              <div class="staff-confirm-dept" id="confirmDept">—</div>
 
-        <div class="divider"><span>secured by</span></div>
-        <div class="sso-note">
-          <span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Supabase Auth — enterprise-grade security
-          </span>
+              <!-- Already done banner (hidden by default) -->
+              <div class="done-banner" id="doneBanner" style="display:none">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span id="doneBannerText">Attendance already completed for today.</span>
+              </div>
+
+              <div class="status-info-box" id="statusInfoBox">
+                <div class="status-row">
+                  <span class="status-label">Today's Date</span>
+                  <span class="status-value" id="confirmDate">—</span>
+                </div>
+                <div class="status-row">
+                  <span class="status-label">Check-In</span>
+                  <span class="status-value" id="confirmCheckin">Not yet</span>
+                </div>
+                <div class="status-row">
+                  <span class="status-label">Check-Out</span>
+                  <span class="status-value" id="confirmCheckout">Not yet</span>
+                </div>
+              </div>
+
+              <button class="btn-checkin" id="actionBtn" type="button" onclick="doCheckAction()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="actionIcon">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <span id="actionBtnText">Check In</span>
+                <div class="spinner" id="actionSpinner"></div>
+              </button>
+
+              <button class="btn-back" onclick="resetStaffPanel()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Back
+              </button>
+            </div>
+          </div>
+
         </div>
+        <!-- end staff panel -->
+
       </div>
     </div>
   </div>
 
   <footer>© 2026 Made by <strong>JB Studios</strong></footer>
 
-  <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="supabase-config.js"></script>
   <script>
     const sb = supabase.createClient(window.__SUPA_URL, window.__SUPA_ANON);
 
-    // Redirect if already logged in
+    // Redirect if already logged in as admin
     (async () => {
       const { data: { session } } = await sb.auth.getSession();
       if (session) window.location.href = 'dashboard.html';
     })();
 
+    /* ══════════ TAB SWITCHING ══════════ */
+    function switchTab(tab) {
+      const isAdmin = tab === 'admin';
+      document.getElementById('tabAdmin').classList.toggle('active', isAdmin);
+      document.getElementById('tabStaff').classList.toggle('active', !isAdmin);
+      document.getElementById('adminPanel').classList.toggle('active', isAdmin);
+      document.getElementById('staffPanel').classList.toggle('active', !isAdmin);
+      if (!isAdmin) {
+        resetStaffPanel();
+        setTimeout(() => document.getElementById('staffIdInput').focus(), 100);
+      }
+    }
+
+    /* ══════════ ADMIN LOGIN ══════════ */
     const emailInput    = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     const loginBtn      = document.getElementById('loginBtn');
-    const errorMsg      = document.getElementById('errorMsg');
-    const errorText     = document.getElementById('errorText');
+    const adminErrorMsg = document.getElementById('adminErrorMsg');
+    const adminErrorText= document.getElementById('adminErrorText');
     const togglePw      = document.getElementById('togglePw');
     const eyeIcon       = document.getElementById('eyeIcon');
 
@@ -261,14 +469,14 @@
         : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
     });
 
-    function showError(msg) { errorText.textContent = msg; errorMsg.classList.add('show'); }
-    function hideError()    { errorMsg.classList.remove('show'); }
+    function showAdminError(msg) { adminErrorText.textContent = msg; adminErrorMsg.classList.add('show'); }
+    function hideAdminError()    { adminErrorMsg.classList.remove('show'); }
 
     loginBtn.addEventListener('click', async () => {
-      hideError();
+      hideAdminError();
       const email    = emailInput.value.trim();
       const password = passwordInput.value;
-      if (!email || !password) { showError('Please enter your email and password.'); return; }
+      if (!email || !password) { showAdminError('Please enter your email and password.'); return; }
 
       loginBtn.disabled = true;
       loginBtn.classList.add('loading');
@@ -277,7 +485,7 @@
         if (error) throw error;
         window.location.href = 'dashboard.html';
       } catch (err) {
-        showError(err.message || 'Invalid email or password. Please try again.');
+        showAdminError(err.message || 'Invalid email or password. Please try again.');
       } finally {
         loginBtn.disabled = false;
         loginBtn.classList.remove('loading');
@@ -286,8 +494,194 @@
 
     [emailInput, passwordInput].forEach(el => {
       el.addEventListener('keydown', e => { if (e.key === 'Enter') loginBtn.click(); });
-      el.addEventListener('input', hideError);
+      el.addEventListener('input', hideAdminError);
     });
+
+    /* ══════════ STAFF CHECK-IN / OUT ══════════ */
+    let currentStaff      = null;
+    let existingRecord    = null;
+    let staffActionDone   = false;
+
+    const staffIdInput    = document.getElementById('staffIdInput');
+    const staffLookupBtn  = document.getElementById('staffLookupBtn');
+    const staffErrorMsg   = document.getElementById('staffErrorMsg');
+    const staffErrorText  = document.getElementById('staffErrorText');
+
+    function showStaffError(msg) { staffErrorText.textContent = msg; staffErrorMsg.classList.add('show'); }
+    function hideStaffError()    { staffErrorMsg.classList.remove('show'); }
+
+    // Only allow digits
+    staffIdInput.addEventListener('input', () => {
+      staffIdInput.value = staffIdInput.value.replace(/\D/g, '').slice(0, 6);
+      hideStaffError();
+    });
+    staffIdInput.addEventListener('keydown', e => { if (e.key === 'Enter') staffLookupBtn.click(); });
+
+    staffLookupBtn.addEventListener('click', async () => {
+      const code = staffIdInput.value.trim();
+      if (code.length !== 6) { showStaffError('Please enter your full 6-digit Staff ID.'); return; }
+
+      staffLookupBtn.disabled = true;
+      staffLookupBtn.classList.add('loading');
+      hideStaffError();
+
+      try {
+        // Look up staff by code
+        const { data: staffData, error: staffErr } = await sb
+          .from('staff')
+          .select('id, name, department, role, staff_code')
+          .eq('staff_code', code)
+          .single();
+
+        if (staffErr || !staffData) {
+          showStaffError('Staff ID not found. Please check and try again.');
+          return;
+        }
+
+        currentStaff = staffData;
+
+        // Check today's attendance record
+        const today = new Date().toISOString().slice(0, 10);
+        const { data: attData } = await sb
+          .from('attendance')
+          .select('*')
+          .eq('staff_id', staffData.id)
+          .eq('date', today)
+          .maybeSingle();
+
+        existingRecord = attData || null;
+        showConfirmScreen(today);
+
+      } catch (err) {
+        showStaffError('Error looking up staff. Please try again.');
+        console.error(err);
+      } finally {
+        staffLookupBtn.disabled = false;
+        staffLookupBtn.classList.remove('loading');
+      }
+    });
+
+    function showConfirmScreen(today) {
+      // Show confirm screen, hide form screen
+      document.getElementById('staffFormScreen').classList.add('hide');
+      document.getElementById('staffConfirmScreen').classList.add('show');
+
+      // Fill in staff info
+      document.getElementById('confirmAvatar').textContent = currentStaff.name[0].toUpperCase();
+      document.getElementById('confirmName').textContent   = currentStaff.name;
+      document.getElementById('confirmDept').textContent   = [currentStaff.department, currentStaff.role].filter(Boolean).join(' · ') || 'Staff Member';
+      document.getElementById('confirmDate').textContent   = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+
+      const rec = existingRecord;
+      const actionBtn  = document.getElementById('actionBtn');
+      const actionIcon = document.getElementById('actionIcon');
+      const actionText = document.getElementById('actionBtnText');
+      const doneBanner = document.getElementById('doneBanner');
+      const spinner    = document.getElementById('actionSpinner');
+      spinner.style.display = 'none';
+
+      // Update status info
+      document.getElementById('confirmCheckin').textContent  = rec?.check_in  || 'Not yet';
+      document.getElementById('confirmCheckout').textContent = rec?.check_out || 'Not yet';
+
+      if (rec?.check_in) {
+        document.getElementById('confirmCheckin').className = 'status-value green';
+      }
+      if (rec?.check_out) {
+        document.getElementById('confirmCheckout').className = 'status-value green';
+      }
+
+      doneBanner.style.display = 'none';
+      actionBtn.style.display  = 'flex';
+      actionBtn.disabled       = false;
+
+      if (!rec || !rec.check_in) {
+        // No record or no check-in → show Check In
+        actionBtn.className = 'btn-checkin';
+        actionText.textContent = 'Check In Now';
+        actionIcon.innerHTML = `<polyline points="20 6 9 17 4 12"/>`;
+      } else if (rec.check_in && !rec.check_out) {
+        // Checked in but not out → show Check Out
+        actionBtn.className = 'btn-checkin btn-checkout';
+        actionText.textContent = 'Check Out Now';
+        actionIcon.innerHTML = `<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>`;
+      } else {
+        // Both done
+        actionBtn.style.display = 'none';
+        doneBanner.style.display = 'flex';
+        document.getElementById('doneBannerText').textContent = `All done for today! In: ${rec.check_in} · Out: ${rec.check_out}`;
+      }
+    }
+
+    async function doCheckAction() {
+      const actionBtn  = document.getElementById('actionBtn');
+      const actionText = document.getElementById('actionBtnText');
+      const spinner    = document.getElementById('actionSpinner');
+      const rec        = existingRecord;
+      const isCheckIn  = !rec || !rec.check_in;
+
+      actionBtn.disabled    = true;
+      actionText.style.display = 'none';
+      spinner.style.display    = 'block';
+
+      try {
+        const now   = new Date();
+        const timeStr = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+        const today = now.toISOString().slice(0, 10);
+
+        if (isCheckIn) {
+          // Insert new attendance record with check_in
+          const payload = {
+            staff_id:  currentStaff.id,
+            date:      today,
+            status:    'Present',
+            check_in:  timeStr,
+            check_out: null,
+            notes:     null,
+            source:    'staff',
+          };
+          const { error } = await sb.from('attendance').upsert(payload, {
+            onConflict: 'staff_id,date',
+            ignoreDuplicates: false,
+          });
+          if (error) throw error;
+
+          // Update local record
+          existingRecord = { ...payload };
+
+        } else {
+          // Update existing record with check_out
+          const { error } = await sb
+            .from('attendance')
+            .update({ check_out: timeStr })
+            .eq('id', rec.id);
+          if (error) throw error;
+
+          existingRecord = { ...rec, check_out: timeStr };
+        }
+
+        // Refresh confirm screen
+        showConfirmScreen(today);
+
+      } catch (err) {
+        console.error(err);
+        alert('Error saving attendance: ' + err.message);
+        actionBtn.disabled = false;
+        actionText.style.display = 'inline';
+        spinner.style.display    = 'none';
+      }
+    }
+
+    function resetStaffPanel() {
+      currentStaff   = null;
+      existingRecord = null;
+      staffIdInput.value = '';
+      hideStaffError();
+      document.getElementById('staffFormScreen').classList.remove('hide');
+      document.getElementById('staffConfirmScreen').classList.remove('show');
+      document.getElementById('confirmCheckin').className  = 'status-value';
+      document.getElementById('confirmCheckout').className = 'status-value';
+    }
   </script>
 </body>
 </html>
