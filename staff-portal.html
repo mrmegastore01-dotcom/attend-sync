@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AttendSync | Staff Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+  <style>
+    /* ─── CSS Variables ─── */
+    :root {
+      --primary:                 #3525cd;
+      --primary-container:       #4f46e5;
+      --on-primary:              #ffffff;
+      --primary-fixed:           #e2dfff;
+      --primary-fixed-dim:       #c3c0ff;
+      --secondary:               #58579b;
+      --secondary-container:     #b6b4ff;
+      --on-secondary-container:  #454386;
+      --surface:                 #f9f9ff;
+      --surface-bright:          #f9f9ff;
+      --surface-container-lowest:#ffffff;
+      --surface-container-low:   #eff3ff;
+      --surface-container:       #e6eeff;
+      --surface-container-high:  #dee9fd;
+      --surface-container-highest:#d9e3f7;
+      --on-surface:              #121c2a;
+      --on-surface-variant:      #464555;
+      --outline:                 #777587;
+      --outline-variant:         #c7c4d8;
+      --error:                   #ba1a1a;
+      --error-container:         #ffdad6;
+      --success:                 #1a7f4b;
+      --success-container:       #d6f5e6;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--surface);
+      color: var(--on-surface);
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── Typography helpers ─── */
+    .font-headline { font-family: 'Manrope', sans-serif; }
+
+    /* ─── Material Icons ─── */
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .icon-filled { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+    /* ─── HEADER ─── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 10px 40px -10px rgba(18,28,42,0.06);
+    }
+
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brand-name {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 800;
+      font-size: 1.2rem;
+      letter-spacing: -0.03em;
+      color: var(--primary);
+    }
+
+    .brand-divider {
+      width: 1px;
+      height: 1rem;
+      background: rgba(199,196,216,0.4);
+      margin: 0 0.5rem;
+    }
+
+    .brand-portal {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 0.02em;
+      color: rgba(70,69,85,0.65);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.4rem;
+      border-radius: 9999px;
+      color: var(--on-surface-variant);
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon-btn:hover { background: var(--surface-container-high); }
+    .icon-btn:active { transform: scale(0.95); }
+
+    .user-info { text-align: right; }
+    .user-name {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--on-surface);
+    }
+    .user-role {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: rgba(70,69,85,0.55);
+    }
+
+    .avatar {
+      width: 2.4rem;
+      height: 2.4rem;
+      border-radius: 0.7rem;
+      background: var(--primary-fixed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      color: var(--primary);
+      font-family: 'Manrope', sans-serif;
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 480px) {
+      .brand-divider, .brand-portal, .user-info { display: none; }
+    }
+
+    /* ─── MAIN ─── */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2.5rem 1rem 6rem;
+    }
+
+    .portal-wrapper {
+      width: 100%;
+      max-width: 640px;
+    }
+
+    /* ─── Hero ─── */
+    .hero {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-title {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.8rem, 5vw, 2.5rem);
+      letter-spacing: -0.04em;
+      color: var(--on-surface);
+      margin-bottom: 0.4rem;
+    }
+
+    .hero-sub {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: rgba(70,69,85,0.75);
+    }
+
+    /* ─── Main Card ─── */
+    .portal-card {
+      background: var(--surface-container-lowest);
+      border-radius: 1.5rem;
+      box-shadow: 0 20px 60px -15px rgba(18,28,42,0.09);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.4);
+    }
+
+    /* ─── Status Header ─── */
+    .status-header {
+      background: var(--surface-container-low);
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(199,196,216,0.12);
+    }
+
+    .status-label {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .pulse-dot-wrapper {
+      position: relative;
+      width: 0.75rem;
+      height: 0.75rem;
+    }
+
+    .pulse-dot-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      opacity: 0;
+      animation: none;
+    }
+
+    .pulse-dot-core {
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      background: var(--outline);
+    }
+
+    /* States for pulse dot */
+    .status--checked-in .pulse-dot-core { background: var(--primary); }
+    .status--checked-in .pulse-dot-ring {
+      background: var(--primary);
+      opacity: 0.4;
+      animation: pulse-ring 1.5s ease-in-out infinite;
+    }
+    .status--checked-out .pulse-dot-core { background: var(--success); }
+
+    @keyframes pulse-ring {
+      0%   { transform: scale(1); opacity: 0.4; }
+      70%  { transform: scale(2.2); opacity: 0; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    .status-label-text {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+    }
+
+    .status-badge {
+      padding: 0.35rem 1rem;
+      border-radius: 9999px;
+      background: var(--surface-container-highest);
+      color: var(--on-surface-variant);
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border: 1px solid rgba(199,196,216,0.2);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .status-badge.badge--checked-in {
+      background: rgba(53,37,205,0.08);
+      color: var(--primary);
+      border-color: rgba(53,37,205,0.15);
+    }
+
+    .status-badge.badge--checked-out {
+      background: rgba(26,127,75,0.08);
+      color: var(--success);
+      border-color: rgba(26,127,75,0.15);
+    }
+
+    /* ─── Clock Display ─── */
+    .clock-section {
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+
+    .live-clock {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 800;
+      font-size: clamp(3rem, 10vw, 4.5rem);
+      letter-spacing: -0.05em;
+      color: var(--on-surface);
+      line-height: 1;
+      margin-bottom: 0.6rem;
+    }
+
+    .live-clock .clock-sep {
+      color: rgba(53,37,205,0.28);
+    }
+
+    .live-clock .ampm {
+      font-size: 0.32em;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      opacity: 0.5;
+      vertical-align: super;
+      margin-left: 0.1em;
+    }
+
+    .date-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: rgba(70,69,85,0.65);
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    /* ─── Action Section ─── */
+    .action-section {
+      padding: 0.5rem 2rem 3rem;
+    }
+
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 480px) {
+      .btn-grid { grid-template-columns: 1fr; }
+      .action-section { padding: 0.5rem 1.25rem 2.5rem; }
+      .status-header { padding: 1.1rem 1.25rem; }
+      .clock-section { padding: 2rem 1.25rem; }
+    }
+
+    /* ─── Action Buttons ─── */
+    .action-btn {
+      border: none;
+      cursor: pointer;
+      border-radius: 1.25rem;
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .action-btn:not(:disabled):hover { transform: scale(1.025); }
+    .action-btn:not(:disabled):active { transform: scale(0.97); }
+
+    .action-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    .btn-icon-wrap {
+      width: 3rem;
+      height: 3rem;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-title {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .btn-sub {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* Check In button */
+    .btn-checkin {
+      background: linear-gradient(135deg, #3525cd 0%, #4f46e5 100%);
+      color: #ffffff;
+      box-shadow: 0 8px 32px -8px rgba(53,37,205,0.35);
+    }
+    .btn-checkin .btn-icon-wrap { background: rgba(255,255,255,0.18); }
+    .btn-checkin:not(:disabled):hover .btn-icon-wrap { background: rgba(255,255,255,0.28); }
+    .btn-checkin .btn-sub { color: rgba(255,255,255,0.6); }
+
+    /* Check Out button */
+    .btn-checkout {
+      background: var(--surface-container);
+      color: rgba(70,69,85,0.45);
+    }
+    .btn-checkout.active {
+      background: linear-gradient(135deg, #1a7f4b 0%, #22a862 100%);
+      color: #ffffff;
+      box-shadow: 0 8px 32px -8px rgba(26,127,75,0.3);
+    }
+    .btn-checkout.active .btn-icon-wrap { background: rgba(255,255,255,0.18); color: #fff; }
+    .btn-checkout.active .btn-sub { color: rgba(255,255,255,0.6); }
+    .btn-checkout .btn-icon-wrap { background: rgba(70,69,85,0.06); }
+
+    /* ─── Attendance Details ─── */
+    .details-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1.75rem;
+      border-top: 1px solid rgba(199,196,216,0.12);
+    }
+
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .detail-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.65rem;
+      background: var(--surface-container-low);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .detail-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(70,69,85,0.55);
+      margin-bottom: 0.15rem;
+    }
+
+    .detail-time {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--on-surface);
+    }
+
+    /* ─── Footnote ─── */
+    .footnote {
+      margin-top: 1.5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      padding: 0.85rem 1rem;
+      border-radius: 0.85rem;
+      background: rgba(239,243,255,0.5);
+      border: 1px solid rgba(199,196,216,0.12);
+    }
+
+    .footnote p {
+      font-size: 0.76rem;
+      color: rgba(70,69,85,0.75);
+      line-height: 1.55;
+      font-style: italic;
+    }
+
+    .footnote .material-symbols-outlined {
+      color: rgba(53,37,205,0.55);
+      font-size: 1.1rem;
+      margin-top: 0.05rem;
+      flex-shrink: 0;
+    }
+
+    /* ─── Stats Row ─── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+      margin-top: 1.25rem;
+    }
+
+    .stat-card {
+      background: var(--surface-container-lowest);
+      border-radius: 1.1rem;
+      border: 1px solid rgba(199,196,216,0.15);
+      padding: 1.25rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-shadow: 0 2px 8px -2px rgba(18,28,42,0.04);
+    }
+
+    .stat-value {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 800;
+      font-size: 1.75rem;
+      letter-spacing: -0.04em;
+      color: var(--primary);
+      margin-bottom: 0.2rem;
+    }
+
+    .stat-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+    }
+
+    /* ─── Loading Overlay ─── */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--surface);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.25rem;
+      transition: opacity 0.4s ease;
+    }
+
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .spinner {
+      width: 2.5rem;
+      height: 2.5rem;
+      border: 3px solid var(--surface-container-high);
+      border-top-color: var(--primary);
+      border-radius: 9999px;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--on-surface-variant);
+      letter-spacing: 0.03em;
+    }
+
+    /* ─── Toast Notification ─── */
+    .toast-container {
+      position: fixed;
+      bottom: 5.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      pointer-events: none;
+    }
+
+    .toast {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.25rem;
+      border-radius: 9999px;
+      font-family: 'Manrope', sans-serif;
+      font-weight: 600;
+      font-size: 0.82rem;
+      box-shadow: 0 8px 24px -4px rgba(18,28,42,0.14);
+      animation: toast-in 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards;
+      white-space: nowrap;
+    }
+
+    .toast.success {
+      background: #d6f5e6;
+      color: #1a7f4b;
+    }
+
+    .toast.error {
+      background: var(--error-container);
+      color: var(--error);
+    }
+
+    .toast.fade-out {
+      animation: toast-out 0.3s ease forwards;
+    }
+
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateY(12px) scale(0.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes toast-out {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to   { opacity: 0; transform: translateY(-8px) scale(0.95); }
+    }
+
+    /* ─── Mobile Bottom Nav ─── */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid rgba(199,196,216,0.18);
+      box-shadow: 0 -4px 20px rgba(18,28,42,0.04);
+      z-index: 100;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0.6rem 1rem 1.2rem;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+      cursor: pointer;
+      color: rgba(18,28,42,0.45);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-item.active { color: var(--primary); }
+
+    .nav-item span.material-symbols-outlined { font-size: 1.4rem; }
+
+    .nav-label {
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-nav { display: flex; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <p class="loading-text">Loading your portal…</p>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="header-inner">
+      <div class="header-brand">
+        <span class="brand-name">AttendSync</span>
+        <div class="brand-divider"></div>
+        <span class="brand-portal">Staff Portal</span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" aria-label="Notifications">
+          <span class="material-symbols-outlined">notifications</span>
+        </button>
+        <div class="user-info" id="userInfo" style="display:none">
+          <p class="user-name" id="userName">—</p>
+          <p class="user-role" id="userRole">Staff Member</p>
+        </div>
+        <div class="avatar" id="userAvatar">
+          <span class="material-symbols-outlined" style="font-size:1.3rem">person</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main>
+    <div class="portal-wrapper">
+
+      <!-- Hero -->
+      <div class="hero">
+        <h1 class="hero-title">Welcome back</h1>
+        <p class="hero-sub">Ready to start your productive session today?</p>
+      </div>
+
+      <!-- Main Card -->
+      <div class="portal-card">
+
+        <!-- Status Header -->
+        <div class="status-header" id="statusHeader">
+          <div class="status-label">
+            <div class="pulse-dot-wrapper">
+              <span class="pulse-dot-ring"></span>
+              <span class="pulse-dot-core"></span>
+            </div>
+            <span class="status-label-text">Current Status</span>
+          </div>
+          <span class="status-badge" id="statusBadge">Not Checked In</span>
+        </div>
+
+        <!-- Clock -->
+        <div class="clock-section">
+          <div class="live-clock" id="liveClock">
+            <span id="clockHM">--:--</span><span class="clock-sep">:</span><span id="clockS">--</span>&thinsp;<span class="ampm" id="clockAMPM">--</span>
+          </div>
+          <div class="date-display">
+            <span class="material-symbols-outlined" style="font-size:0.95rem">calendar_today</span>
+            <span id="dateDisplay">—</span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="action-section">
+          <div class="btn-grid">
+            <!-- Check In -->
+            <button class="action-btn btn-checkin" id="btnCheckIn" onclick="handleCheckIn()">
+              <div class="btn-icon-wrap">
+                <span class="material-symbols-outlined icon-filled" style="font-size:1.75rem">login</span>
+              </div>
+              <span class="btn-title">Check In</span>
+              <span class="btn-sub">Start your shift</span>
+            </button>
+            <!-- Check Out -->
+            <button class="action-btn btn-checkout" id="btnCheckOut" onclick="handleCheckOut()" disabled>
+              <div class="btn-icon-wrap">
+                <span class="material-symbols-outlined" style="font-size:1.75rem">logout</span>
+              </div>
+              <span class="btn-title">Check Out</span>
+              <span class="btn-sub" id="checkOutSub">Shift not started</span>
+            </button>
+          </div>
+
+          <!-- Attendance Details -->
+          <div class="details-row">
+            <div class="detail-item">
+              <div class="detail-icon">
+                <span class="material-symbols-outlined icon-filled" style="font-size:1.2rem">schedule</span>
+              </div>
+              <div>
+                <p class="detail-label">Arrival</p>
+                <p class="detail-time" id="arrivalTime">-- : --</p>
+              </div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-icon">
+                <span class="material-symbols-outlined" style="font-size:1.2rem">timer_off</span>
+              </div>
+              <div>
+                <p class="detail-label">Departure</p>
+                <p class="detail-time" id="departureTime">-- : --</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footnote -->
+          <div class="footnote">
+            <span class="material-symbols-outlined">info</span>
+            <p>Your time is recorded automatically and cannot be edited.</p>
+          </div>
+        </div>
+      </div><!-- end portal-card -->
+
+      <!-- Stats -->
+      <div class="stats-row" id="statsRow" style="visibility:hidden">
+        <div class="stat-card">
+          <span class="stat-value" id="statDays">—</span>
+          <span class="stat-label">Days Present</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="statHours">—</span>
+          <span class="stat-label">Total Hours</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="statPunct">—</span>
+          <span class="stat-label">Punctuality</span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="mobile-nav">
+    <a class="nav-item active" href="#">
+      <span class="material-symbols-outlined icon-filled">grid_view</span>
+      <span class="nav-label">Dashboard</span>
+    </a>
+    <a class="nav-item" href="#">
+      <span class="material-symbols-outlined">history</span>
+      <span class="nav-label">History</span>
+    </a>
+    <a class="nav-item" href="#">
+      <span class="material-symbols-outlined">calendar_today</span>
+      <span class="nav-label">Schedule</span>
+    </a>
+    <a class="nav-item" href="#">
+      <span class="material-symbols-outlined">person</span>
+      <span class="nav-label">Profile</span>
+    </a>
+  </nav>
+
+  <script>
+    /* ================================================================
+       AttendSync – Staff Portal
+       Depends on getSupabase() being available in scope.
+    ================================================================ */
+
+    // ── State ──────────────────────────────────────────────────────
+    let currentUser   = null;
+    let todayRecord   = null;
+    let isProcessing  = false;
+
+    // ── Helpers ────────────────────────────────────────────────────
+
+    function getTodayDate() {
+      return new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    }
+
+    function formatTime12(dateString) {
+      if (!dateString) return null;
+      const d = new Date(dateString);
+      if (isNaN(d.getTime())) return null;
+      let hours   = d.getHours();
+      const mins  = d.getMinutes().toString().padStart(2, '0');
+      const ampm  = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      return `${hours}:${mins} ${ampm}`;
+    }
+
+    function formatDateFull(date) {
+      return date.toLocaleDateString('en-US', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+    }
+
+    function getOrdinal(n) {
+      const s = ['th','st','nd','rd'], v = n % 100;
+      return n + (s[(v-20)%10] || s[v] || s[0]);
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast     = document.createElement('div');
+      toast.className = `toast ${type}`;
+
+      const icon = document.createElement('span');
+      icon.className = 'material-symbols-outlined';
+      icon.style.fontSize = '1rem';
+      icon.textContent = type === 'success' ? 'check_circle' : 'error';
+
+      toast.appendChild(icon);
+      toast.appendChild(document.createTextNode(message));
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('fade-out');
+        toast.addEventListener('animationend', () => toast.remove(), { once: true });
+      }, 3200);
+    }
+
+    function setLoading(show) {
+      const overlay = document.getElementById('loadingOverlay');
+      if (show) {
+        overlay.classList.remove('hidden');
+      } else {
+        overlay.classList.add('hidden');
+      }
+    }
+
+    function setButtonsProcessing(processing) {
+      isProcessing = processing;
+      const btnIn  = document.getElementById('btnCheckIn');
+      const btnOut = document.getElementById('btnCheckOut');
+      if (processing) {
+        btnIn.disabled  = true;
+        btnOut.disabled = true;
+      } else {
+        applyUIState();
+      }
+    }
+
+    // ── Live Clock ────────────────────────────────────────────────
+
+    function startClock() {
+      const dateEl  = document.getElementById('dateDisplay');
+      const hmEl    = document.getElementById('clockHM');
+      const sEl     = document.getElementById('clockS');
+      const ampmEl  = document.getElementById('clockAMPM');
+
+      function tick() {
+        const now     = new Date();
+        const hours24 = now.getHours();
+        const mins    = now.getMinutes();
+        const secs    = now.getSeconds();
+        const period  = hours24 >= 12 ? 'PM' : 'AM';
+        const h12     = hours24 % 12 || 12; // no leading zero: 1–12
+
+        hmEl.textContent   = `${h12}:${mins.toString().padStart(2, '0')}`;
+        sEl.textContent    = secs.toString().padStart(2, '0');
+        ampmEl.textContent = period;
+
+        const d = now;
+        const day   = d.toLocaleDateString('en-US', { weekday: 'long' });
+        const month = d.toLocaleDateString('en-US', { month: 'long' });
+        const year  = d.getFullYear();
+        dateEl.textContent = `${day}, ${month} ${getOrdinal(d.getDate())}, ${year}`;
+      }
+
+      tick();
+      setInterval(tick, 1000);
+    }
+
+    // ── UI State Application ───────────────────────────────────────
+
+    function applyUIState() {
+      const statusHeader = document.getElementById('statusHeader');
+      const statusBadge  = document.getElementById('statusBadge');
+      const btnIn        = document.getElementById('btnCheckIn');
+      const btnOut       = document.getElementById('btnCheckOut');
+      const checkOutSub  = document.getElementById('checkOutSub');
+      const arrivalEl    = document.getElementById('arrivalTime');
+      const departureEl  = document.getElementById('departureTime');
+
+      // Default: Not Checked In
+      let statusKey = 'not-checked-in';
+
+      if (todayRecord) {
+        if (todayRecord.check_out) {
+          statusKey = 'checked-out';
+        } else if (todayRecord.check_in || todayRecord.status === 'Present') {
+          statusKey = 'checked-in';
+        }
+      }
+
+      // Remove all status classes
+      statusHeader.classList.remove('status--checked-in', 'status--checked-out');
+      statusBadge.classList.remove('badge--checked-in', 'badge--checked-out');
+      btnOut.classList.remove('active');
+
+      if (statusKey === 'not-checked-in') {
+        statusBadge.textContent = 'Not Checked In';
+        btnIn.disabled          = false;
+        btnOut.disabled         = true;
+        checkOutSub.textContent = 'Shift not started';
+        arrivalEl.textContent   = '-- : --';
+        departureEl.textContent = '-- : --';
+
+      } else if (statusKey === 'checked-in') {
+        statusBadge.textContent = 'Checked In';
+        statusBadge.classList.add('badge--checked-in');
+        statusHeader.classList.add('status--checked-in');
+        btnIn.disabled          = true;
+        btnOut.disabled         = false;
+        btnOut.classList.add('active');
+        checkOutSub.textContent = 'End your shift';
+
+        const arrTime = formatTime12(todayRecord.check_in);
+        arrivalEl.textContent   = arrTime || '-- : --';
+        departureEl.textContent = '-- : --';
+
+      } else if (statusKey === 'checked-out') {
+        statusBadge.textContent = 'Checked Out';
+        statusBadge.classList.add('badge--checked-out');
+        statusHeader.classList.add('status--checked-out');
+        btnIn.disabled          = true;
+        btnOut.disabled         = true;
+        checkOutSub.textContent = 'Shift complete';
+
+        const arrTime = formatTime12(todayRecord.check_in);
+        const depTime = formatTime12(todayRecord.check_out);
+        arrivalEl.textContent   = arrTime || '-- : --';
+        departureEl.textContent = depTime || '-- : --';
+      }
+    }
+
+    // ── Data Fetching ──────────────────────────────────────────────
+
+    async function loadUserAndRecord() {
+      try {
+        const sb   = getSupabase();
+        const { data: userData, error: userError } = await sb.auth.getUser();
+
+        if (userError || !userData?.user) {
+          showToast('Unable to load user session.', 'error');
+          return;
+        }
+
+        currentUser = userData.user;
+
+        // Update header UI
+        const meta    = currentUser.user_metadata || {};
+        const name    = meta.full_name || meta.name || currentUser.email?.split('@')[0] || 'Staff';
+        const role    = meta.role || 'Staff Member';
+        const initials= name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+
+        document.getElementById('userName').textContent  = name;
+        document.getElementById('userRole').textContent  = role;
+        document.getElementById('userInfo').style.display = '';
+
+        const avatarEl = document.getElementById('userAvatar');
+        if (meta.avatar_url) {
+          avatarEl.innerHTML = `<img src="${meta.avatar_url}" alt="${name}" style="width:100%;height:100%;object-fit:cover;" />`;
+        } else {
+          avatarEl.textContent = initials || '?';
+        }
+
+        // Update hero
+        document.querySelector('.hero-title').textContent = `Welcome back, ${name.split(' ')[0]}`;
+
+        // Fetch today's record
+        const today = getTodayDate();
+        const { data: records, error: recError } = await sb
+          .from('attendance')
+          .select('*')
+          .eq('staff_id', currentUser.id)
+          .eq('date', today)
+          .limit(1);
+
+        if (recError) {
+          console.warn('Record fetch error:', recError.message);
+        } else {
+          todayRecord = records?.[0] || null;
+        }
+
+        // Fetch stats (best-effort)
+        await loadStats(sb);
+
+        applyUIState();
+
+      } catch (err) {
+        console.error('loadUserAndRecord:', err);
+        showToast('Something went wrong loading your data.', 'error');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function loadStats(sb) {
+      try {
+        const { count: daysPresent } = await sb
+          .from('attendance')
+          .select('*', { count: 'exact', head: true })
+          .eq('staff_id', currentUser.id)
+          .eq('status', 'Present');
+
+        document.getElementById('statDays').textContent  = daysPresent ?? '—';
+        document.getElementById('statHours').textContent = daysPresent ? `${Math.round(daysPresent * 7.5)}h` : '—';
+        document.getElementById('statPunct').textContent = daysPresent ? '100%' : '—';
+        document.getElementById('statsRow').style.visibility = 'visible';
+      } catch (_) {
+        // Stats are non-critical; silently skip
+      }
+    }
+
+    // ── Actions ────────────────────────────────────────────────────
+
+    async function handleCheckIn() {
+      if (isProcessing || !currentUser) return;
+      setButtonsProcessing(true);
+
+      try {
+        const sb    = getSupabase();
+        const today = getTodayDate();
+
+        const { error } = await sb
+          .from('attendance')
+          .upsert(
+            { staff_id: currentUser.id, date: today, status: 'Present' },
+            { onConflict: 'staff_id,date' }
+          );
+
+        if (error) throw error;
+
+        // Re-fetch record so UI has latest times set by DB
+        const { data: refreshed } = await sb
+          .from('attendance')
+          .select('*')
+          .eq('staff_id', currentUser.id)
+          .eq('date', today)
+          .limit(1);
+
+        todayRecord = refreshed?.[0] || { staff_id: currentUser.id, date: today, status: 'Present' };
+        showToast('Checked in successfully', 'success');
+        applyUIState();
+
+      } catch (err) {
+        console.error('handleCheckIn:', err);
+        showToast('Check-in failed. Please try again.', 'error');
+      } finally {
+        setButtonsProcessing(false);
+      }
+    }
+
+    async function handleCheckOut() {
+      if (isProcessing || !currentUser) return;
+      setButtonsProcessing(true);
+
+      try {
+        const sb    = getSupabase();
+        const today = getTodayDate();
+        const now   = new Date().toISOString();
+
+        const { error } = await sb
+          .from('attendance')
+          .update({ check_out: now })
+          .eq('staff_id', currentUser.id)
+          .eq('date', today);
+
+        if (error) throw error;
+
+        // Re-fetch
+        const { data: refreshed } = await sb
+          .from('attendance')
+          .select('*')
+          .eq('staff_id', currentUser.id)
+          .eq('date', today)
+          .limit(1);
+
+        todayRecord = refreshed?.[0] || { ...todayRecord, check_out: now };
+        showToast('Checked out successfully', 'success');
+        applyUIState();
+
+      } catch (err) {
+        console.error('handleCheckOut:', err);
+        showToast('Check-out failed. Please try again.', 'error');
+      } finally {
+        setButtonsProcessing(false);
+      }
+    }
+
+    // ── Init ───────────────────────────────────────────────────────
+
+    document.addEventListener('DOMContentLoaded', () => {
+      startClock();
+
+      // Wait a tick so getSupabase() (injected by host app) is ready
+      setTimeout(() => {
+        if (typeof getSupabase === 'function') {
+          loadUserAndRecord();
+        } else {
+          // Demo mode: simulate loaded state for standalone viewing
+          console.warn('getSupabase() not found – running in demo mode.');
+          runDemoMode();
+        }
+      }, 100);
+    });
+
+    // ── Demo Mode (when Supabase is not connected) ─────────────────
+    function runDemoMode() {
+      currentUser = { id: 'demo-user', email: 'sarah@company.com',
+        user_metadata: { full_name: 'Sarah Jenkins', role: 'Senior Designer' } };
+
+      const meta     = currentUser.user_metadata;
+      const name     = meta.full_name;
+      const initials = name.split(' ').map(w=>w[0]).join('').toUpperCase();
+
+      document.getElementById('userName').textContent    = name;
+      document.getElementById('userRole').textContent    = meta.role;
+      document.getElementById('userInfo').style.display  = '';
+      document.getElementById('userAvatar').textContent  = initials;
+      document.querySelector('.hero-title').textContent  = `Welcome back, ${name.split(' ')[0]}`;
+
+      // Simulate not checked in
+      todayRecord = null;
+
+      document.getElementById('statDays').textContent  = '22';
+      document.getElementById('statHours').textContent = '168h';
+      document.getElementById('statPunct').textContent = '100%';
+      document.getElementById('statsRow').style.visibility = 'visible';
+
+      applyUIState();
+      setLoading(false);
+
+      // Override actions to simulate
+      window.handleCheckIn = async function () {
+        if (isProcessing) return;
+        setButtonsProcessing(true);
+        await delay(900);
+        const now = new Date().toISOString();
+        todayRecord = { staff_id: 'demo', date: getTodayDate(), status: 'Present', check_in: now, check_out: null };
+        showToast('Checked in successfully', 'success');
+        applyUIState();
+        setButtonsProcessing(false);
+      };
+
+      window.handleCheckOut = async function () {
+        if (isProcessing) return;
+        setButtonsProcessing(true);
+        await delay(900);
+        const now = new Date().toISOString();
+        todayRecord = { ...todayRecord, check_out: now };
+        showToast('Checked out successfully', 'success');
+        applyUIState();
+        setButtonsProcessing(false);
+      };
+    }
+
+    function delay(ms) { return new Promise(res => setTimeout(res, ms)); }
+  </script>
+</body>
+</html>
