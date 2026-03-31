@@ -245,34 +245,20 @@
   }
 
   function setStatus(staffId, status, btn) {
-  const row = btn.closest('tr');
+    const row = btn.closest('tr');
+    row.querySelectorAll('.status-btn').forEach(b => { b.className = 'status-btn'; });
+    btn.className = `status-btn sel-${status}`;
 
-  // Clear previous selection
-  row.querySelectorAll('.status-btn').forEach(b => {
-    b.className = 'status-btn';
-  });
-
-  btn.className = `status-btn sel-${status}`;
-
-  // ✅ AUTO CHECK-IN when Present is selected
-  if (status === 'Present') {
-    const now = new Date();
-
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-
-    const time = `${hours}:${minutes}`;
-
-    const cinInput = row.querySelector(`#cin-${staffId}`);
-
-    // Only set if empty (don’t overwrite manual edits)
-    if (cinInput && !cinInput.value) {
-      cinInput.value = time;
+    // AUTO CHECK-IN with PKT time when Present is selected
+    if (status === 'Present') {
+      const pkt = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Karachi' }));
+      const time = String(pkt.getHours()).padStart(2,'0') + ':' + String(pkt.getMinutes()).padStart(2,'0');
+      const cinInput = row.querySelector(`#cin-${staffId}`);
+      if (cinInput && !cinInput.value) cinInput.value = time;
     }
-  }
 
-  updateBadge();
-}
+    updateBadge();
+  }
 
   function getRowData(staffId) {
     const row    = document.getElementById(`row-${staffId}`);

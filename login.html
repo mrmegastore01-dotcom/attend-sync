@@ -312,38 +312,50 @@
     })();
 
     /* ═══════════════════════════════════════════════
-       NIGHT SHIFT CONFIG
-       Shift  : 9 PM (21:00) → 6 AM (06:00) next day
+       NIGHT SHIFT CONFIG  (PKT = UTC+5)
+       Shift  : 9 PM (21:00) → 7 AM (07:00) next day
        Reset  : 9 AM (09:00) — before 9 AM the portal
                 still belongs to last night's shift.
        The "shift date" is always the date the shift STARTED.
     ═══════════════════════════════════════════════ */
     const SHIFT_START = 21; // 9 PM  — shift begins
-    const SHIFT_END   =  6; // 6 AM  — shift ends
+    const SHIFT_END   =  7; // 7 AM  — shift ends (extended for busy staff)
     const DAY_RESET   =  9; // 9 AM  — portal resets to new shift day
+    const LATE_HOUR   = 21; // Late threshold hour
+    const LATE_MIN    = 15; // Late threshold minute (9:15 PM)
+
+    /** Returns current time as a Date object in PKT (Asia/Karachi, UTC+5) */
+    function nowPKT() {
+      return new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Karachi' }));
+    }
 
     /**
-     * Returns the shift-start date for the current moment.
-     *
-     * 00:00–08:59  → yesterday  (mid-shift OR post-shift wind-down)
-     * 09:00–23:59  → today      (upcoming shift / active from 9 PM)
-     *
-     * This means a staff member checking out at 4 AM on Tuesday
-     * gets their record saved under Monday's date — correct!
-     * And a staff member checking in at 10 PM Monday also saves
-     * under Monday. Consistent.
+     * Returns the shift-start date (YYYY-MM-DD) using PKT.
+     * 00:00–08:59 PKT → yesterday  (still in last night's shift)
+     * 09:00–23:59 PKT → today
      */
     function getShiftDate() {
-      const now  = new Date();
-      const hour = now.getHours();
-      // Before 9 AM → still last night's shift
+      const pkt  = nowPKT();
+      const hour = pkt.getHours();
       if (hour < DAY_RESET) {
-        const d = new Date(now);
+        const d = new Date(pkt);
         d.setDate(d.getDate() - 1);
-        return d.toISOString().slice(0, 10);
+        return localDateStr(d);
       }
-      // 9 AM and later → today is the shift date
-      return now.toISOString().slice(0, 10);
+      return localDateStr(pkt);
+    }
+
+    function localDateStr(d) {
+      const y  = d.getFullYear();
+      const m  = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${dd}`;
+    }
+
+    /** Returns current PKT time as "HH:MM" (24-hr) for storing in DB */
+    function nowTime24() {
+      const pkt = nowPKT();
+      return String(pkt.getHours()).padStart(2, '0') + ':' + String(pkt.getMinutes()).padStart(2, '0');
     }
 
     /* ═══════════════════════════════════════════════
@@ -357,11 +369,6 @@
       const period = h >= 12 ? 'PM' : 'AM';
       h = h % 12 || 12;
       return `${h}:${m} ${period}`;
-    }
-
-    function nowTime24() {
-      const n = new Date();
-      return String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
     }
 
     function calcWorkingHours(checkIn, checkOut) {

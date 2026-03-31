@@ -65,6 +65,9 @@
     .badge.absent{background:var(--absent-bg);color:var(--absent-fg)}
     .badge.leave{background:var(--leave-bg);color:var(--leave-fg)}
 
+    /* Late badge */
+    .badge-late{display:inline-flex;align-items:center;padding:0.15rem 0.45rem;border-radius:99px;font-size:0.65rem;font-weight:700;background:#fff3e0;color:#e65100;border:1px solid rgba(230,81,0,0.25);margin-left:0.35rem;white-space:nowrap;vertical-align:middle}
+
     /* Working hours pill */
     .hours-pill{display:inline-flex;align-items:center;gap:0.3rem;background:var(--hours-bg);color:var(--hours-fg);padding:0.2rem 0.6rem;border-radius:99px;font-size:0.7rem;font-weight:700;white-space:nowrap}
     .hours-pill svg{width:11px;height:11px}
@@ -122,7 +125,7 @@
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
         </svg>
         <span>
-          <strong>Night Shift Mode</strong> — Shift: <strong>9:00 PM → 6:00 AM</strong> &nbsp;·&nbsp; Auto-absent fires at <strong>11:00 PM</strong> for no-shows &nbsp;·&nbsp; Dashboard resets at <strong>9:00 AM</strong>.
+          <strong>Night Shift Mode</strong> — Shift: <strong>9:00 PM → 7:00 AM</strong> &nbsp;·&nbsp; Auto-absent fires at <strong>9:30 PM</strong> for no-shows &nbsp;·&nbsp; Dashboard resets at <strong>9:00 AM</strong>.
           <span id="shiftDateLabel"></span>
         </span>
       </div>
@@ -167,6 +170,16 @@
             <div class="stat-label">On Leave</div>
             <div class="stat-value" id="statLeave">—</div>
             <div class="stat-sub">Approved leaves</div>
+          </div>
+        </div>
+        <div class="stat-card" style="animation-delay:0.25s">
+          <div class="stat-icon" style="background:var(--hours-bg);color:var(--hours-fg)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-label">Total Hours</div>
+            <div class="stat-value" id="statTotalHours" style="font-size:1.5rem">—</div>
+            <div class="stat-sub">Shift worked so far</div>
           </div>
         </div>
       </div>
@@ -235,74 +248,75 @@
   const sb = getSupabase();
 
   /* ═══════════════════════════════════════════════════
-     NIGHT SHIFT CONFIG
+     NIGHT SHIFT CONFIG  (PKT = UTC+5)
      ─────────────────────────────────────────────────
-     Shift window : 9 PM (21:00) → 6 AM (06:00)
-     Auto-absent  : 11 PM (23:00) — 2 hrs after shift start
-     Shift date   : always the calendar date the shift STARTED
-     Day boundary : 9 AM (09:00) — before 9 AM admin still
-                    sees the previous night's shift; from 9 AM
-                    onwards the view resets to "awaiting tonight"
-     ─────────────────────────────────────────────────
-     Time zones / hour breakdown:
-       00:00–05:59  → mid-shift (started last night)  → shiftDate = YESTERDAY
-       06:00–08:59  → shift just ended, transition     → shiftDate = YESTERDAY  (live=false)
-       09:00–20:59  → daytime, between shifts          → shiftDate = TODAY (upcoming)
-       21:00–23:59  → shift started tonight            → shiftDate = TODAY  (live=true)
+     Shift window : 9 PM → 7 AM  (next calendar day)
+     Late threshold: 9:15 PM  (21:15 PKT)
+     Auto-absent  : 9:30 PM  (21:30 PKT)
+     Day boundary : 9 AM  (09:00 PKT)
+       00:00–06:59 PKT → mid-shift (started last night)   → shiftDate = YESTERDAY
+       07:00–08:59 PKT → shift just ended, still yesterday → shiftDate = YESTERDAY
+       09:00–23:59 PKT → today's upcoming/active shift    → shiftDate = TODAY
   ═══════════════════════════════════════════════════ */
 
-  const SHIFT_START_HOUR  = 21; // 9 PM  — shift begins
-  const SHIFT_END_HOUR    =  6; // 6 AM  — shift ends
-  const AUTO_ABSENT_HOUR  = 23; // 11 PM — mark absent if not checked in by now
-  const DAY_BOUNDARY_HOUR =  9; // 9 AM  — admin view resets to new shift day
+  const SHIFT_START_HOUR  = 21;   // 9 PM  PKT
+  const SHIFT_END_HOUR    =  7;   // 7 AM  PKT
+  const AUTO_ABSENT_HOUR  = 21;   // 9 PM  PKT
+  const AUTO_ABSENT_MIN   = 30;   // :30   → 9:30 PM
+  const LATE_HOUR         = 21;   // Late threshold: after 9:15 PM
+  const LATE_MIN          = 15;
+  const DAY_BOUNDARY_HOUR =  9;   // 9 AM  — admin view resets
 
-  /**
-   * Returns the shift date string "YYYY-MM-DD" for the CURRENT context.
-   * This is the date the shift STARTED (or will start tonight).
-   */
-  function getShiftDate() {
-    const now  = new Date();
-    const hour = now.getHours();
+  /* ─── PKT Helpers ─────────────────────────────── */
 
-    // 00:00–05:59 → still in last night's shift
-    if (hour < SHIFT_END_HOUR) {
-      const d = new Date(now);
-      d.setDate(d.getDate() - 1);
-      return d.toISOString().slice(0, 10);
-    }
-
-    // 06:00–08:59 → shift just ended, keep showing yesterday until 9 AM
-    if (hour < DAY_BOUNDARY_HOUR) {
-      const d = new Date(now);
-      d.setDate(d.getDate() - 1);
-      return d.toISOString().slice(0, 10);
-    }
-
-    // 09:00–23:59 → today is current/upcoming shift date
-    return now.toISOString().slice(0, 10);
+  /** Current date/time in Pakistan Standard Time (UTC+5) */
+  function nowPKT() {
+    return new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Karachi' }));
   }
 
   /**
-   * Returns true only while the shift is actively running (9 PM → 6 AM).
+   * Returns the shift-start date (YYYY-MM-DD, PKT) for any given PKT Date.
+   * Rule:
+   *   00:00–08:59 PKT → yesterday  (still in last night's shift)
+   *   09:00–23:59 PKT → today
    */
+  function getShiftDate(pkt) {
+    pkt = pkt || nowPKT();
+    const h = pkt.getHours();
+    if (h < DAY_BOUNDARY_HOUR) {
+      const d = new Date(pkt);
+      d.setDate(d.getDate() - 1);
+      return localDateStr(d);
+    }
+    return localDateStr(pkt);
+  }
+
+  /** YYYY-MM-DD from a local Date object */
+  function localDateStr(d) {
+    const y  = d.getFullYear();
+    const m  = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${dd}`;
+  }
+
+  /** Returns true only while the shift is actively running */
   function isShiftLive() {
-    const h = new Date().getHours();
+    const h = nowPKT().getHours();
     return h >= SHIFT_START_HOUR || h < SHIFT_END_HOUR;
   }
 
-  /**
-   * Returns true when it is past the auto-absent threshold (11 PM)
-   * AND the shift is live (i.e. 11 PM–5:59 AM).
-   */
+  /** Returns true when past the auto-absent threshold (9:30 PM PKT) */
   function isPastAutoAbsentTime() {
-    const h = new Date().getHours();
-    // 23:00–23:59 or 00:00–05:59 (midnight crossover still in shift)
-    return (h >= AUTO_ABSENT_HOUR) || (h < SHIFT_END_HOUR);
+    const pkt = nowPKT();
+    const h = pkt.getHours(), m = pkt.getMinutes();
+    const pastThreshold = (h > AUTO_ABSENT_HOUR) || (h === AUTO_ABSENT_HOUR && m >= AUTO_ABSENT_MIN);
+    return pastThreshold || h < SHIFT_END_HOUR;
   }
 
-  /* ═══════════════════════════════════════════════════
-     AM/PM formatter
-  ═══════════════════════════════════════════════════ */
+  /**
+   * Convert a stored "HH:MM" (24-hr) string to "h:MM AM/PM" display.
+   * Works for both check_in and check_out across midnight.
+   */
   function toAmPm(t) {
     if (!t) return null;
     const [hStr, mStr] = t.split(':');
@@ -313,146 +327,113 @@
     return `${h}:${m} ${period}`;
   }
 
-  /* ═══════════════════════════════════════════════════
-     WORKING HOURS CALCULATOR
-     Handles midnight crossover for night shift.
-     check_in  e.g. "21:30"
-     check_out e.g. "05:45" (next calendar day)
-  ═══════════════════════════════════════════════════ */
+  /**
+   * Is this check_in time "Late"?
+   * Late = after 9:15 PM PKT  (stored as "HH:MM" 24-hr, e.g. "21:20")
+   * Handles edge case: check-in near midnight or early AM is always late
+   * if shift started at 9 PM.
+   */
+  function isLate(checkInStr) {
+    if (!checkInStr) return false;
+    const [h, m] = checkInStr.split(':').map(Number);
+    // After midnight (0–6 AM) means very late for a 9 PM shift
+    if (h < SHIFT_END_HOUR) return true;
+    // Evening: check against 21:15
+    if (h > LATE_HOUR) return true;
+    if (h === LATE_HOUR && m > LATE_MIN) return true;
+    return false;
+  }
+
+  /**
+   * Calculate working hours from two "HH:MM" strings.
+   * Handles midnight crossover (check-out in AM, check-in in PM).
+   */
   function calcWorkingHours(checkIn, checkOut) {
     if (!checkIn || !checkOut) return null;
-
-    const toMins = (t) => {
-      const [h, m] = t.split(':').map(Number);
-      return h * 60 + m;
-    };
-
+    const toMins = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
     let inMins  = toMins(checkIn);
     let outMins = toMins(checkOut);
-
-    // Night shift: if check-out is earlier in the day than check-in,
-    // it crossed midnight — add 24 hours to check-out
-    if (outMins <= inMins) {
-      outMins += 24 * 60;
-    }
-
+    if (outMins <= inMins) outMins += 24 * 60; // crossed midnight
     const totalMins = outMins - inMins;
-    if (totalMins <= 0 || totalMins > 24 * 60) return null; // sanity check
-
+    if (totalMins <= 0 || totalMins > 24 * 60) return null;
     const h = Math.floor(totalMins / 60);
     const m = totalMins % 60;
+    return { str: m > 0 ? `${h}h ${m}m` : `${h}h`, totalMins };
+  }
+
+  /** Sum all completed working hours in an attendance array */
+  function sumWorkingHours(records) {
+    let total = 0;
+    records.forEach(r => {
+      const wh = calcWorkingHours(r.check_in, r.check_out);
+      if (wh) total += wh.totalMins;
+    });
+    if (!total) return null;
+    const h = Math.floor(total / 60);
+    const m = total % 60;
     return m > 0 ? `${h}h ${m}m` : `${h}h`;
   }
 
   /* ═══════════════════════════════════════════════════
      AUTO ABSENT  — Two-tier logic
-     ─────────────────────────────────────────────────
-     Tier 1 — LIVE shift, past 11 PM (23:00):
-       It is now 2 hours into tonight's shift and a
-       staff member still hasn't checked in.
-       → Mark them Absent on TONIGHT's shift date.
-       Only runs if isPastAutoAbsentTime() is true.
-
-     Tier 2 — Previous completed shift:
-       Any staff with no record on the last fully
-       completed shift date get marked Absent.
-       This covers admins who open the dashboard
-       during the day (9 AM–9 PM).
-     ─────────────────────────────────────────────────
-     Both tiers use ignoreDuplicates:true so they
-     NEVER overwrite a record already set by staff
-     check-in, admin marking, or a previous auto run.
   ═══════════════════════════════════════════════════ */
   async function runAutoAbsent(allStaff) {
-    const now  = new Date();
-    const h    = now.getHours();
+    const pkt = nowPKT();
+    const h   = pkt.getHours();
     let totalMarked = 0;
 
-    /* ── Tier 1: Current shift, past 11 PM threshold ── */
+    /* ── Tier 1: Current shift, past 9:30 PM threshold ── */
     if (isPastAutoAbsentTime()) {
-      const currentShiftDate = getShiftDate();
-
+      const currentShiftDate = getShiftDate(pkt);
       try {
         const { data: existing } = await sb
-          .from('attendance')
-          .select('staff_id')
-          .eq('date', currentShiftDate);
-
+          .from('attendance').select('staff_id').eq('date', currentShiftDate);
         const markedIds = new Set((existing || []).map(r => r.staff_id));
-        // Only mark staff who have NO record at all for tonight
-        const missing = allStaff.filter(s => !markedIds.has(s.id));
-
+        const missing   = allStaff.filter(s => !markedIds.has(s.id));
         if (missing.length) {
           const absents = missing.map(s => ({
-            staff_id:  s.id,
-            date:      currentShiftDate,
-            status:    'Absent',
-            check_in:  null,
-            check_out: null,
-            notes:     `Auto-absent: did not check in by ${AUTO_ABSENT_HOUR}:00`,
-            source:    'auto',
+            staff_id: s.id, date: currentShiftDate, status: 'Absent',
+            check_in: null, check_out: null,
+            notes: 'Auto-absent: did not check in by 9:30 PM', source: 'auto',
           }));
-
           const { error } = await sb.from('attendance').upsert(absents, {
-            onConflict: 'staff_id,date',
-            ignoreDuplicates: true,
+            onConflict: 'staff_id,date', ignoreDuplicates: true,
           });
           if (error) console.warn('Auto-absent tier 1 error:', error.message);
           else totalMarked += missing.length;
         }
-      } catch (e) {
-        console.warn('Auto-absent tier 1 failed:', e.message);
-      }
+      } catch (e) { console.warn('Auto-absent tier 1 failed:', e.message); }
     }
 
     /* ── Tier 2: Previous fully-completed shift ── */
-    // Calculate previous shift date
-    let prevShiftDate;
+    let prevShiftDate = null;
     if (h < SHIFT_END_HOUR) {
-      // 00:00–05:59: in current shift; previous = 2 nights ago
-      const d = new Date(now); d.setDate(d.getDate() - 2);
-      prevShiftDate = d.toISOString().slice(0, 10);
-    } else if (h < DAY_BOUNDARY_HOUR) {
-      // 06:00–08:59: shift just ended; previous = yesterday (same shift we just saw)
-      // Skip tier 2 here — tier 1 already covered tonight's shift above
-      prevShiftDate = null;
-    } else {
-      // 09:00–23:59: daytime or early shift; previous = yesterday
-      const d = new Date(now); d.setDate(d.getDate() - 1);
-      prevShiftDate = d.toISOString().slice(0, 10);
+      const d = new Date(pkt); d.setDate(d.getDate() - 2);
+      prevShiftDate = localDateStr(d);
+    } else if (h >= DAY_BOUNDARY_HOUR) {
+      const d = new Date(pkt); d.setDate(d.getDate() - 1);
+      prevShiftDate = localDateStr(d);
     }
 
     if (prevShiftDate) {
       try {
         const { data: existing } = await sb
-          .from('attendance')
-          .select('staff_id')
-          .eq('date', prevShiftDate);
-
+          .from('attendance').select('staff_id').eq('date', prevShiftDate);
         const markedIds = new Set((existing || []).map(r => r.staff_id));
         const missing   = allStaff.filter(s => !markedIds.has(s.id));
-
         if (missing.length) {
           const absents = missing.map(s => ({
-            staff_id:  s.id,
-            date:      prevShiftDate,
-            status:    'Absent',
-            check_in:  null,
-            check_out: null,
-            notes:     'Auto-marked absent (shift ended)',
-            source:    'auto',
+            staff_id: s.id, date: prevShiftDate, status: 'Absent',
+            check_in: null, check_out: null,
+            notes: 'Auto-marked absent (shift ended)', source: 'auto',
           }));
-
           const { error } = await sb.from('attendance').upsert(absents, {
-            onConflict: 'staff_id,date',
-            ignoreDuplicates: true,
+            onConflict: 'staff_id,date', ignoreDuplicates: true,
           });
           if (error) console.warn('Auto-absent tier 2 error:', error.message);
           else totalMarked += missing.length;
         }
-      } catch (e) {
-        console.warn('Auto-absent tier 2 failed:', e.message);
-      }
+      } catch (e) { console.warn('Auto-absent tier 2 failed:', e.message); }
     }
 
     return totalMarked;
@@ -464,61 +445,54 @@
   (async () => {
     const session = await requireAuth();
     if (!session) return;
-
     document.getElementById('sidebarContainer').innerHTML = renderSidebar('dashboard', session.user.email);
     document.getElementById('headerContainer').innerHTML  = renderHeader('Dashboard', "Welcome back — here's what's happening tonight");
     document.getElementById('footerContainer').innerHTML  = renderFooter();
-
     await loadDashboard();
   })();
 
   async function loadDashboard() {
-    const shiftDate = getShiftDate();
+    const pkt       = nowPKT();
+    const shiftDate = getShiftDate(pkt);
     const live      = isShiftLive();
-
-    // Determine display state
-    const h = new Date().getHours();
-    const isDaytime = h >= DAY_BOUNDARY_HOUR && h < SHIFT_START_HOUR; // 9 AM – 9 PM
+    const h         = pkt.getHours();
+    const isDaytime = h >= DAY_BOUNDARY_HOUR && h < SHIFT_START_HOUR;
 
     const fmtShift = new Date(shiftDate + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short' });
 
     let stateLabel, tableTitle;
     if (live) {
-      stateLabel  = ` &nbsp;<span style="color:#2e7d32;font-weight:700">● Live</span>`;
-      tableTitle  = 'Live Shift Attendance';
+      stateLabel = ` &nbsp;<span style="color:#2e7d32;font-weight:700">● Live</span>`;
+      tableTitle = 'Live Shift Attendance';
     } else if (isDaytime) {
-      stateLabel  = ` &nbsp;<span style="color:#ef6c00;font-weight:600">Upcoming tonight</span>`;
-      tableTitle  = 'Last Shift Attendance';
+      stateLabel = ` &nbsp;<span style="color:#ef6c00;font-weight:600">Upcoming tonight</span>`;
+      tableTitle = 'Last Shift Attendance';
     } else {
-      stateLabel  = ` &nbsp;<span style="color:#4a5568">Completed</span>`;
-      tableTitle  = 'Last Shift Attendance';
+      stateLabel = ` &nbsp;<span style="color:#4a5568">Completed</span>`;
+      tableTitle = 'Last Shift Attendance';
     }
 
     document.getElementById('shiftDateLabel').innerHTML =
       ` — Shift date: <strong>${fmtShift}</strong>${stateLabel}`;
     document.getElementById('attTableTitle').textContent = tableTitle;
 
-    // Show auto-absent countdown during live shift, before 11 PM
     if (live && h >= SHIFT_START_HOUR && h < AUTO_ABSENT_HOUR) {
-      const minsLeft = (AUTO_ABSENT_HOUR - h) * 60 - new Date().getMinutes();
+      const minsLeft = (AUTO_ABSENT_HOUR - h) * 60 + (AUTO_ABSENT_MIN - pkt.getMinutes());
       document.getElementById('shiftDateLabel').innerHTML +=
-        ` &nbsp;·&nbsp; <span style="color:#c62828">Auto-absent in ~${minsLeft} min</span>`;
+        ` &nbsp;·&nbsp; <span style="color:#c62828">Auto-absent in ~${Math.max(0,minsLeft)} min</span>`;
     }
 
     try {
-      /* 1 ── Load all staff */
+      /* 1 ── All staff */
       const { data: allStaff, error: staffErr } = await sb
         .from('staff').select('id, name, department, role').order('name');
       if (staffErr) throw staffErr;
-      const total = allStaff.length;
 
-      /* 2 ── Auto-absent (fire and check count) */
+      /* 2 ── Auto-absent */
       const autoCount = await runAutoAbsent(allStaff);
-      if (autoCount > 0) {
-        showToast(`Auto-marked ${autoCount} staff as absent for the previous shift.`, 'info');
-      }
+      if (autoCount > 0) showToast(`Auto-marked ${autoCount} staff as absent.`, 'info');
 
-      /* 3 ── Load attendance for current shift date */
+      /* 3 ── Attendance for shift date */
       const { data: shiftAtt, error: attErr } = await sb
         .from('attendance')
         .select('*, staff(name, department)')
@@ -529,16 +503,20 @@
       const present = shiftAtt.filter(r => r.status === 'Present').length;
       const absent  = shiftAtt.filter(r => r.status === 'Absent').length;
       const leave   = shiftAtt.filter(r => r.status === 'Leave').length;
-      const pct     = total ? Math.round((present / total) * 100) : 0;
+      const pct     = allStaff.length ? Math.round((present / allStaff.length) * 100) : 0;
 
-      document.getElementById('statTotal').textContent      = total;
+      document.getElementById('statTotal').textContent      = allStaff.length;
       document.getElementById('statPresent').textContent    = present;
       document.getElementById('statAbsent').textContent     = absent;
       document.getElementById('statLeave').textContent      = leave;
-      document.getElementById('statPresentPct').textContent = total ? `${pct}% attendance rate` : 'No data yet';
-      document.getElementById('statAbsentPct').textContent  = total ? `${total - present - leave} not present` : '';
+      document.getElementById('statPresentPct').textContent = allStaff.length ? `${pct}% attendance rate` : 'No data yet';
+      document.getElementById('statAbsentPct').textContent  = allStaff.length ? `${allStaff.length - present - leave} not present` : '';
 
-      /* 4 ── Attendance table (with In / Out / Hours) */
+      /* 4 ── Total hours stat card */
+      const totalHrs = sumWorkingHours(shiftAtt.filter(r => r.status === 'Present'));
+      document.getElementById('statTotalHours').textContent = totalHrs || '—';
+
+      /* 5 ── Attendance table */
       const attBody = document.getElementById('todayAttBody');
       if (!shiftAtt.length) {
         attBody.innerHTML = `<tr><td colspan="5" class="empty-state">No attendance marked for this shift yet.</td></tr>`;
@@ -546,45 +524,35 @@
         attBody.innerHTML = shiftAtt.map(r => {
           const inTime  = toAmPm(r.check_in);
           const outTime = toAmPm(r.check_out);
-          const hrs     = calcWorkingHours(r.check_in, r.check_out);
+          const wh      = calcWorkingHours(r.check_in, r.check_out);
 
-          // Detect auto-absent source
           const isAutoAbsent = r.source === 'auto' && r.status === 'Absent';
-          const statusBadge  = isAutoAbsent
+          const late         = r.status === 'Present' && isLate(r.check_in);
+
+          const statusBadge = isAutoAbsent
             ? `<span class="badge auto-absent">Auto Absent</span>`
-            : `<span class="badge ${r.status.toLowerCase()}">${r.status}</span>`;
+            : `<span class="badge ${r.status.toLowerCase()}">${r.status}</span>${late ? '<span class="badge-late">Late</span>' : ''}`;
 
-          const inCell  = inTime
-            ? `<span class="time-cell">${inTime}</span>`
-            : `<span class="time-cell dim">—</span>`;
-
-          const outCell = outTime
-            ? `<span class="time-cell">${outTime}</span>`
-            : (r.status === 'Present'
-                ? `<span class="time-cell dim">Active</span>`
-                : `<span class="time-cell dim">—</span>`);
-
-          const hrsCell = hrs
-            ? `<span class="hours-pill">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                ${hrs}
-               </span>`
+          const inCell  = inTime  ? `<span class="time-cell">${inTime}</span>`  : `<span class="time-cell dim">—</span>`;
+          const outCell = outTime ? `<span class="time-cell">${outTime}</span>` :
+            (r.status === 'Present' ? `<span class="time-cell dim">Active</span>` : `<span class="time-cell dim">—</span>`);
+          const hrsCell = wh
+            ? `<span class="hours-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${wh.str}</span>`
             : (r.check_in && !r.check_out && r.status === 'Present'
                 ? `<span class="hours-pending">In progress…</span>`
                 : `<span class="time-cell dim">—</span>`);
 
-          return `
-            <tr>
-              <td><strong>${r.staff?.name ?? '—'}</strong></td>
-              <td>${statusBadge}</td>
-              <td>${inCell}</td>
-              <td>${outCell}</td>
-              <td>${hrsCell}</td>
-            </tr>`;
+          return `<tr>
+            <td><strong>${r.staff?.name ?? '—'}</strong></td>
+            <td>${statusBadge}</td>
+            <td>${inCell}</td>
+            <td>${outCell}</td>
+            <td>${hrsCell}</td>
+          </tr>`;
         }).join('');
       }
 
-      /* 5 ── Staff overview */
+      /* 6 ── Staff overview */
       const staffBody = document.getElementById('staffPreviewBody');
       if (!allStaff.length) {
         staffBody.innerHTML = `<tr><td colspan="3" class="empty-state">No staff added yet</td></tr>`;
@@ -603,5 +571,6 @@
     }
   }
 </script>
+
 </body>
 </html>

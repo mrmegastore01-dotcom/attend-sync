@@ -53,6 +53,9 @@
     .badge.Present{background:var(--present-bg);color:var(--present-fg)}
     .badge.Absent{background:var(--absent-bg);color:var(--absent-fg)}
     .badge.Leave{background:var(--leave-bg);color:var(--leave-fg)}
+    .badge-late{display:inline-flex;align-items:center;padding:0.15rem 0.45rem;border-radius:99px;font-size:0.65rem;font-weight:700;background:#fff3e0;color:#e65100;border:1px solid rgba(230,81,0,0.25);margin-left:0.35rem;white-space:nowrap;vertical-align:middle}
+    .hours-pill{display:inline-flex;align-items:center;gap:0.3rem;background:#e8eaf6;color:#283593;padding:0.2rem 0.55rem;border-radius:99px;font-size:0.75rem;font-weight:700;white-space:nowrap}
+    .chip-hours{background:#e8eaf6;color:#283593}
     .empty-state{padding:3rem;text-align:center;color:var(--on-surface-variant);font-size:0.875rem}
 
     @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
@@ -106,6 +109,7 @@
         <div class="chip chip-present" id="chipPresent">Present: 0</div>
         <div class="chip chip-absent" id="chipAbsent">Absent: 0</div>
         <div class="chip chip-leave" id="chipLeave">Leave: 0</div>
+        <div class="chip chip-hours" id="chipHours">Total Hrs: —</div>
       </div>
 
       <!-- Results table -->
@@ -128,7 +132,7 @@
                 <th>Status</th>
                 <th>Check-In</th>
                 <th>Check-Out</th>
-                <th>Notes</th>
+                <th>Work Hours</th>
               </tr>
             </thead>
             <tbody id="reportBody">
@@ -151,6 +155,52 @@
   const sb = getSupabase();
   let reportData = [];
 
+  /* ── PKT / Night Shift Helpers ─────────────────── */
+  const LATE_HOUR = 21, LATE_MIN = 15;   // 9:15 PM PKT
+  const SHIFT_END_HOUR = 7;              // 7 AM PKT — shift boundary
+
+  function toAmPm(t) {
+    if (!t) return null;
+    const [hStr, mStr] = t.split(':');
+    let h = parseInt(hStr, 10);
+    const m = (mStr || '00').padStart(2, '0');
+    const period = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return `${h}:${m} ${period}`;
+  }
+
+  function isLate(checkInStr) {
+    if (!checkInStr) return false;
+    const [h, m] = checkInStr.split(':').map(Number);
+    if (h < SHIFT_END_HOUR) return true;        // early AM = arrived very late
+    if (h > LATE_HOUR) return true;
+    if (h === LATE_HOUR && m > LATE_MIN) return true;
+    return false;
+  }
+
+  function calcWorkingHours(checkIn, checkOut) {
+    if (!checkIn || !checkOut) return null;
+    const toMins = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+    let inM = toMins(checkIn), outM = toMins(checkOut);
+    if (outM <= inM) outM += 24 * 60;
+    const diff = outM - inM;
+    if (diff <= 0 || diff > 24 * 60) return null;
+    const h = Math.floor(diff / 60), m = diff % 60;
+    return { str: m > 0 ? `${h}h ${m}m` : `${h}h`, totalMins: diff };
+  }
+
+  function sumHours(records) {
+    let total = 0;
+    records.forEach(r => {
+      const wh = calcWorkingHours(r.check_in, r.check_out);
+      if (wh) total += wh.totalMins;
+    });
+    if (!total) return null;
+    const h = Math.floor(total / 60), m = total % 60;
+    return m > 0 ? `${h}h ${m}m` : `${h}h`;
+  }
+
+  /* ── Init ──────────────────────────────────────── */
   (async () => {
     const session = await requireAuth();
     if (!session) return;
@@ -158,11 +208,10 @@
     document.getElementById('headerContainer').innerHTML  = renderHeader('Reports', 'Filter and export attendance records');
     document.getElementById('footerContainer').innerHTML  = renderFooter();
 
-    // Default date range: current month
     const now  = new Date();
     const y    = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0');
     document.getElementById('fromDate').value = `${y}-${m}-01`;
-    document.getElementById('toDate').value   = todayISO();
+    document.getElementById('toDate').value   = now.toISOString().slice(0,10);
 
     await loadStaffOptions();
   })();
@@ -188,15 +237,14 @@
 
     const body = document.getElementById('reportBody');
     body.innerHTML = `<tr><td colspan="8" class="empty-state">Loading…</td></tr>`;
-    document.getElementById('exportBtn').style.display = 'none';
+    document.getElementById('exportBtn').style.display  = 'none';
     document.getElementById('summaryRow').style.display = 'none';
 
     try {
       let query = sb
         .from('attendance')
         .select('*, staff(name, department)')
-        .gte('date', from)
-        .lte('date', to)
+        .gte('date', from).lte('date', to)
         .order('date', { ascending: false });
 
       if (staff)  query = query.eq('staff_id', staff);
@@ -215,60 +263,79 @@
 
   function renderReport() {
     const body = document.getElementById('reportBody');
-
     if (!reportData.length) {
       body.innerHTML = `<tr><td colspan="8" class="empty-state">No records found for the selected filters.</td></tr>`;
       document.getElementById('tableTitle').textContent = 'Attendance Report (0 records)';
       return;
     }
 
-    // Summary
     const total   = reportData.length;
     const present = reportData.filter(r => r.status === 'Present').length;
     const absent  = reportData.filter(r => r.status === 'Absent').length;
     const leave   = reportData.filter(r => r.status === 'Leave').length;
+    const totalHrs = sumHours(reportData.filter(r => r.status === 'Present'));
 
     document.getElementById('chipTotal').textContent   = `Total: ${total}`;
     document.getElementById('chipPresent').textContent = `Present: ${present}`;
     document.getElementById('chipAbsent').textContent  = `Absent: ${absent}`;
     document.getElementById('chipLeave').textContent   = `Leave: ${leave}`;
+    document.getElementById('chipHours').textContent   = `Total Hrs: ${totalHrs || '—'}`;
     document.getElementById('summaryRow').style.display = 'flex';
     document.getElementById('tableTitle').textContent  = `Attendance Report (${total} records)`;
     document.getElementById('exportBtn').style.display = 'inline-flex';
 
-    body.innerHTML = reportData.map((r, i) => `
-      <tr>
+    body.innerHTML = reportData.map((r, i) => {
+      const inDisp  = toAmPm(r.check_in)  || '—';
+      const outDisp = toAmPm(r.check_out) || '—';
+      const wh      = calcWorkingHours(r.check_in, r.check_out);
+      const late    = r.status === 'Present' && isLate(r.check_in);
+      const whCell  = wh
+        ? `<span class="hours-pill">${wh.str}</span>`
+        : (r.check_in && !r.check_out && r.status === 'Present'
+            ? '<span style="color:#4a5568;font-style:italic;font-size:0.75rem">In progress…</span>'
+            : '—');
+
+      return `<tr>
         <td style="color:var(--on-surface-variant)">${i+1}</td>
         <td><strong>${r.staff?.name ?? '—'}</strong></td>
         <td>${r.staff?.department ?? '—'}</td>
         <td>${fmtDate(r.date)}</td>
-        <td><span class="badge ${r.status}">${r.status}</span></td>
-        <td>${r.check_in || '—'}</td>
-        <td>${r.check_out || '—'}</td>
-        <td>${r.notes || '—'}</td>
-      </tr>`).join('');
+        <td>
+          <span class="badge ${r.status}">${r.status}</span>
+          ${late ? '<span class="badge-late">Late</span>' : ''}
+        </td>
+        <td>${inDisp}</td>
+        <td>${outDisp}</td>
+        <td>${whCell}</td>
+      </tr>`;
+    }).join('');
   }
 
   function exportCSV() {
     if (!reportData.length) { showToast('No data to export.', 'error'); return; }
 
-    const headers = ['#','Name','Department','Date','Status','Check-In','Check-Out','Notes'];
-    const rows = reportData.map((r, i) => [
-      i+1,
-      `"${r.staff?.name ?? ''}"`,
-      `"${r.staff?.department ?? ''}"`,
-      r.date,
-      r.status,
-      r.check_in  || '',
-      r.check_out || '',
-      `"${r.notes || ''}"`,
-    ]);
+    const headers = ['#','Name','Department','Date','Status','Late','Check-In','Check-Out','Work Hours'];
+    const rows = reportData.map((r, i) => {
+      const wh   = calcWorkingHours(r.check_in, r.check_out);
+      const late = r.status === 'Present' && isLate(r.check_in) ? 'Yes' : 'No';
+      return [
+        i+1,
+        `"${r.staff?.name ?? ''}"`,
+        `"${r.staff?.department ?? ''}"`,
+        r.date,
+        r.status,
+        late,
+        toAmPm(r.check_in)  || '',
+        toAmPm(r.check_out) || '',
+        wh ? wh.str : '',
+      ];
+    });
 
-    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const csv  = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
-    a.href     = url;
+    a.href = url;
     a.download = `attendance-report-${document.getElementById('fromDate').value}-to-${document.getElementById('toDate').value}.csv`;
     a.click();
     URL.revokeObjectURL(url);
