@@ -10,362 +10,148 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --primary: #3525cd;
-      --primary-container: #4f46e5;
-      --on-primary: #ffffff;
-      --secondary-container: #b6b4ff;
-      --background: #f9f9ff;
-      --surface: #f9f9ff;
-      --surface-lowest: #ffffff;
-      --surface-low: #eff3ff;
-      --surface-high: #dee9fd;
-      --on-surface: #121c2a;
-      --on-surface-variant: #4a5568;
-      --shadow-tinted: rgba(18,28,42,0.06);
-      --error: #c0392b;
-      --present-bg: #e8f5e9;
-      --present-fg: #2e7d32;
+      --primary:#3525cd; --primary-container:#4f46e5; --on-primary:#fff;
+      --secondary-container:#b6b4ff; --background:#f9f9ff; --surface:#f9f9ff;
+      --surface-lowest:#fff; --surface-low:#eff3ff; --surface-high:#dee9fd;
+      --on-surface:#121c2a; --on-surface-variant:#4a5568;
+      --shadow-tinted:rgba(18,28,42,0.06); --error:#c0392b;
+      --present-bg:#e8f5e9; --present-fg:#2e7d32;
     }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--background);color:var(--on-surface);min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(53,37,205,0.07) 0%,transparent 65%),radial-gradient(ellipse 60% 50% at 85% 85%,rgba(79,70,229,0.05) 0%,transparent 60%);pointer-events:none;z-index:0}
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--background);
-      color: var(--on-surface);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background:
-        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(53,37,205,0.07) 0%, transparent 65%),
-        radial-gradient(ellipse 60% 50% at 85% 85%, rgba(79,70,229,0.05) 0%, transparent 60%);
-      pointer-events: none; z-index: 0;
-    }
-
-    /* ── Layout ── */
-    .page-wrapper {
-      position: relative; z-index: 1; flex: 1;
-      display: flex; min-height: 0;
-    }
+    .page-wrapper{position:relative;z-index:1;flex:1;display:flex;min-height:0}
 
     /* ── Left Panel ── */
-    .left-panel {
-      width: 50%; flex-shrink: 0;
-      background: var(--surface-low);
-      display: flex; flex-direction: column;
-      justify-content: space-between;
-      padding: 3rem 3.5rem;
-      position: relative; overflow: hidden;
-    }
-    .left-panel::after {
-      content: ''; position: absolute; bottom: -80px; right: -80px;
-      width: 320px; height: 320px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(53,37,205,0.09) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .brand { display: flex; align-items: center; gap: 0.75rem; }
-    .brand-mark {
-      width: 40px; height: 40px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-container));
-      border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
-    .brand-mark svg { width: 22px; height: 22px; }
-    .brand-name {
-      font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 1.1rem;
-      color: var(--on-surface); letter-spacing: -0.02em;
-    }
-    .brand-name span { color: var(--primary); }
-    .panel-body { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 3rem 0; }
-    .panel-eyebrow {
-      font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--primary); margin-bottom: 1rem;
-    }
-    .panel-headline {
-      font-family: 'Manrope', sans-serif; font-weight: 800;
-      font-size: clamp(1.9rem, 2.8vw, 2.75rem);
-      line-height: 1.1; letter-spacing: -0.03em;
-      color: var(--on-surface); margin-bottom: 1.25rem;
-    }
-    .panel-headline em { font-style: normal; color: var(--primary); }
-    .panel-desc {
-      font-size: 0.9rem; line-height: 1.7;
-      color: var(--on-surface-variant); max-width: 360px; margin-bottom: 2.5rem;
-    }
-    .feature-list { display: flex; flex-direction: column; gap: 0.875rem; }
-    .feature-item { display: flex; align-items: center; gap: 0.875rem; }
-    .feature-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--primary); box-shadow: 0 0 0 4px var(--secondary-container); flex-shrink: 0;
-    }
-    .feature-item span { font-size: 0.875rem; color: var(--on-surface-variant); font-weight: 500; }
-    .panel-footer-note { font-size: 0.75rem; color: var(--on-surface-variant); }
+    .left-panel{width:50%;flex-shrink:0;background:var(--surface-low);display:flex;flex-direction:column;justify-content:space-between;padding:3rem 3.5rem;position:relative;overflow:hidden}
+    .left-panel::after{content:'';position:absolute;bottom:-80px;right:-80px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(53,37,205,0.09) 0%,transparent 70%);pointer-events:none}
+    .brand{display:flex;align-items:center;gap:0.75rem}
+    .brand-mark{width:40px;height:40px;background:linear-gradient(135deg,var(--primary),var(--primary-container));border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .brand-mark svg{width:22px;height:22px}
+    .brand-name{font-family:'Manrope',sans-serif;font-weight:800;font-size:1.1rem;color:var(--on-surface);letter-spacing:-0.02em}
+    .brand-name span{color:var(--primary)}
+    .panel-body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:3rem 0}
+    .panel-eyebrow{font-size:0.6875rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--primary);margin-bottom:1rem}
+    .panel-headline{font-family:'Manrope',sans-serif;font-weight:800;font-size:clamp(1.9rem,2.8vw,2.75rem);line-height:1.1;letter-spacing:-0.03em;color:var(--on-surface);margin-bottom:1.25rem}
+    .panel-headline em{font-style:normal;color:var(--primary)}
+    .panel-desc{font-size:0.9rem;line-height:1.7;color:var(--on-surface-variant);max-width:360px;margin-bottom:2.5rem}
+    .feature-list{display:flex;flex-direction:column;gap:0.875rem}
+    .feature-item{display:flex;align-items:center;gap:0.875rem}
+    .feature-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);box-shadow:0 0 0 4px var(--secondary-container);flex-shrink:0}
+    .feature-item span{font-size:0.875rem;color:var(--on-surface-variant);font-weight:500}
+    .panel-footer-note{font-size:0.75rem;color:var(--on-surface-variant)}
 
     /* ── Right Panel ── */
-    .right-panel {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 2rem 2.5rem; background: var(--surface); overflow-y: auto;
-    }
-    .login-card {
-      background: var(--surface-lowest); border-radius: 1.25rem;
-      padding: 2.25rem 2.5rem; width: 100%; max-width: 430px;
-      box-shadow: 0 20px 60px var(--shadow-tinted), 0 4px 16px rgba(18,28,42,0.04);
-      animation: fadeUp 0.6s 0.1s ease both;
-    }
+    .right-panel{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 2.5rem;background:var(--surface);overflow-y:auto}
+    .login-card{background:var(--surface-lowest);border-radius:1.25rem;padding:2.25rem 2.5rem;width:100%;max-width:430px;box-shadow:0 20px 60px var(--shadow-tinted),0 4px 16px rgba(18,28,42,0.04);animation:fadeUp 0.6s 0.1s ease both}
 
     /* ── Tabs ── */
-    .tab-bar {
-      display: flex; margin-bottom: 1.75rem;
-      background: var(--surface-low); border-radius: 0.75rem; padding: 0.25rem; gap: 0.25rem;
-    }
-    .tab-btn {
-      flex: 1; padding: 0.6rem 0.5rem; border: none; border-radius: 0.5rem;
-      font-size: 0.8rem; font-weight: 600; cursor: pointer; font-family: inherit;
-      background: transparent; color: var(--on-surface-variant);
-      display: flex; align-items: center; justify-content: center; gap: 0.375rem;
-      transition: all 0.2s ease; white-space: nowrap;
-    }
-    .tab-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
-    .tab-btn.active {
-      background: var(--surface-lowest); color: var(--primary);
-      box-shadow: 0 2px 8px rgba(18,28,42,0.08);
-    }
+    .tab-bar{display:flex;margin-bottom:1.75rem;background:var(--surface-low);border-radius:0.75rem;padding:0.25rem;gap:0.25rem}
+    .tab-btn{flex:1;padding:0.6rem 0.5rem;border:none;border-radius:0.5rem;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit;background:transparent;color:var(--on-surface-variant);display:flex;align-items:center;justify-content:center;gap:0.375rem;transition:all 0.2s ease;white-space:nowrap}
+    .tab-btn svg{width:14px;height:14px;flex-shrink:0}
+    .tab-btn.active{background:var(--surface-lowest);color:var(--primary);box-shadow:0 2px 8px rgba(18,28,42,0.08)}
 
-    /* ── Shared form styles ── */
-    .card-header { margin-bottom: 1.5rem; }
-    .card-header h2 {
-      font-family: 'Manrope', sans-serif; font-weight: 700;
-      font-size: 1.5rem; letter-spacing: -0.03em;
-      color: var(--on-surface); margin-bottom: 0.3rem;
-    }
-    .card-header p { font-size: 0.875rem; color: var(--on-surface-variant); }
-
-    .form-group { margin-bottom: 1.125rem; }
-    .form-group label {
-      display: block; font-size: 0.8125rem; font-weight: 600;
-      color: var(--on-surface); margin-bottom: 0.45rem;
-    }
-    .input-wrap { position: relative; }
-    .input-icon {
-      position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
-      width: 17px; height: 17px; color: var(--on-surface-variant); pointer-events: none;
-    }
-    .form-input {
-      width: 100%; padding: 0.7rem 2.75rem 0.7rem 0.9rem;
-      border-radius: 0.625rem; border: 1.5px solid rgba(199,196,216,0.6);
-      background: var(--surface-low); font-size: 0.9rem;
-      color: var(--on-surface); outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;
-    }
-    .form-input:focus {
-      border-color: var(--primary); box-shadow: 0 0 0 3px rgba(53,37,205,0.08);
-      background: var(--surface-lowest);
-    }
-    .toggle-pw {
-      position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%);
-      background: none; border: none; cursor: pointer;
-      color: var(--on-surface-variant); padding: 4px;
-      display: flex; align-items: center;
-    }
-    .toggle-pw svg { width: 17px; height: 17px; }
-    .form-meta { display: flex; justify-content: flex-end; margin-top: 0.375rem; }
-    .form-meta a { font-size: 0.8rem; color: var(--primary); text-decoration: none; font-weight: 500; }
-
-    .btn-login {
-      width: 100%; padding: 0.825rem; border-radius: 0.75rem;
-      background: linear-gradient(135deg, var(--primary), var(--primary-container));
-      color: #fff; font-size: 0.9rem; font-weight: 600; border: none;
-      cursor: pointer; font-family: inherit; margin-top: 0.5rem;
-      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-      transition: opacity 0.2s, transform 0.15s;
-    }
-    .btn-login:hover:not(:disabled) { opacity: 0.92; transform: translateY(-1px); }
-    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
-    .spinner {
-      width: 17px; height: 17px;
-      border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff;
-      border-radius: 50%; animation: spin 0.7s linear infinite;
-      display: none; flex-shrink: 0;
-    }
-    .btn-login.loading .spinner { display: block; }
-    .btn-login.loading .btn-text { display: none; }
-
-    .error-msg {
-      display: none; align-items: center; gap: 0.5rem;
-      padding: 0.7rem 0.9rem; border-radius: 0.625rem; margin-bottom: 1.125rem;
-      background: rgba(192,57,43,0.08); border: 1px solid rgba(192,57,43,0.2);
-      color: var(--error); font-size: 0.8125rem; font-weight: 500;
-    }
-    .error-msg.show { display: flex; }
-    .error-msg svg { width: 15px; height: 15px; flex-shrink: 0; }
-
-    .divider {
-      display: flex; align-items: center; gap: 0.875rem;
-      margin: 1.25rem 0 0.875rem; color: var(--on-surface-variant); font-size: 0.75rem;
-    }
-    .divider::before, .divider::after {
-      content: ''; flex: 1; height: 1px; background: rgba(199,196,216,0.5);
-    }
-    .sso-note { display: flex; justify-content: center; }
-    .sso-note span {
-      display: flex; align-items: center; gap: 0.4rem;
-      font-size: 0.8rem; color: var(--on-surface-variant);
-    }
-    .sso-note svg { width: 13px; height: 13px; }
+    /* ── Shared form ── */
+    .card-header{margin-bottom:1.5rem}
+    .card-header h2{font-family:'Manrope',sans-serif;font-weight:700;font-size:1.5rem;letter-spacing:-0.03em;color:var(--on-surface);margin-bottom:0.3rem}
+    .card-header p{font-size:0.875rem;color:var(--on-surface-variant)}
+    .form-group{margin-bottom:1.125rem}
+    .form-group label{display:block;font-size:0.8125rem;font-weight:600;color:var(--on-surface);margin-bottom:0.45rem}
+    .input-wrap{position:relative}
+    .input-icon{position:absolute;right:1rem;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--on-surface-variant);pointer-events:none}
+    .form-input{width:100%;padding:0.7rem 2.75rem 0.7rem 0.9rem;border-radius:0.625rem;border:1.5px solid rgba(199,196,216,0.6);background:var(--surface-low);font-size:0.9rem;color:var(--on-surface);outline:none;transition:border-color 0.2s,box-shadow 0.2s;font-family:inherit}
+    .form-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(53,37,205,0.08);background:var(--surface-lowest)}
+    .toggle-pw{position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--on-surface-variant);padding:4px;display:flex;align-items:center}
+    .toggle-pw svg{width:17px;height:17px}
+    .form-meta{display:flex;justify-content:flex-end;margin-top:0.375rem}
+    .form-meta a{font-size:0.8rem;color:var(--primary);text-decoration:none;font-weight:500}
+    .btn-login{width:100%;padding:0.825rem;border-radius:0.75rem;background:linear-gradient(135deg,var(--primary),var(--primary-container));color:#fff;font-size:0.9rem;font-weight:600;border:none;cursor:pointer;font-family:inherit;margin-top:0.5rem;display:flex;align-items:center;justify-content:center;gap:0.5rem;transition:opacity 0.2s,transform 0.15s}
+    .btn-login:hover:not(:disabled){opacity:0.92;transform:translateY(-1px)}
+    .btn-login:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+    .spinner{width:17px;height:17px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:none;flex-shrink:0}
+    .btn-login.loading .spinner{display:block}
+    .btn-login.loading .btn-text{display:none}
+    .error-msg{display:none;align-items:center;gap:0.5rem;padding:0.7rem 0.9rem;border-radius:0.625rem;margin-bottom:1.125rem;background:rgba(192,57,43,0.08);border:1px solid rgba(192,57,43,0.2);color:var(--error);font-size:0.8125rem;font-weight:500}
+    .error-msg.show{display:flex}
+    .error-msg svg{width:15px;height:15px;flex-shrink:0}
+    .divider{display:flex;align-items:center;gap:0.875rem;margin:1.25rem 0 0.875rem;color:var(--on-surface-variant);font-size:0.75rem}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(199,196,216,0.5)}
+    .sso-note{display:flex;justify-content:center}
+    .sso-note span{display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;color:var(--on-surface-variant)}
+    .sso-note svg{width:13px;height:13px}
 
     /* ── Panel visibility ── */
-    .staff-panel { display: none; }
-    .staff-panel.active { display: block; }
-    .admin-panel { display: none; }
-    .admin-panel.active { display: block; }
+    .staff-panel{display:none}.staff-panel.active{display:block}
+    .admin-panel{display:none}.admin-panel.active{display:block}
 
     /* ── Staff ID input ── */
-    .id-input {
-      width: 100%; padding: 0.9rem 1rem;
-      font-size: 1.75rem; font-weight: 700; letter-spacing: 0.2em;
-      font-family: 'Courier New', monospace;
-      border-radius: 0.75rem; border: 2px solid rgba(199,196,216,0.6);
-      background: var(--surface-low); color: var(--on-surface);
-      outline: none; text-align: center;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .id-input:focus {
-      border-color: var(--primary); box-shadow: 0 0 0 4px rgba(53,37,205,0.1);
-      background: var(--surface-lowest);
-    }
-    .id-input::placeholder { font-size: 1.25rem; letter-spacing: 0.1em; color: rgba(74,85,104,0.35); }
+    .id-input{width:100%;padding:0.9rem 1rem;font-size:1.75rem;font-weight:700;letter-spacing:0.2em;font-family:'Courier New',monospace;border-radius:0.75rem;border:2px solid rgba(199,196,216,0.6);background:var(--surface-low);color:var(--on-surface);outline:none;text-align:center;transition:border-color 0.2s,box-shadow 0.2s}
+    .id-input:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(53,37,205,0.1);background:var(--surface-lowest)}
+    .id-input::placeholder{font-size:1.25rem;letter-spacing:0.1em;color:rgba(74,85,104,0.35)}
 
-    /* ── Staff confirm screen ── */
-    .confirm-screen { display: none; }
-    .confirm-screen.show { display: block; }
-    .staff-form-screen.hide { display: none; }
+    /* ── Confirm screen ── */
+    .confirm-screen{display:none}.confirm-screen.show{display:block}
+    .staff-form-screen.hide{display:none}
+    .staff-confirm-card{text-align:center;padding:0.25rem 0}
+    .staff-avatar-lg{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary-container));color:#fff;font-weight:800;font-size:1.6rem;display:flex;align-items:center;justify-content:center;margin:0 auto 0.875rem;box-shadow:0 6px 20px rgba(53,37,205,0.25)}
+    .staff-confirm-name{font-family:'Manrope',sans-serif;font-weight:700;font-size:1.2rem;color:var(--on-surface);margin-bottom:0.2rem}
+    .staff-confirm-dept{font-size:0.8125rem;color:var(--on-surface-variant);margin-bottom:1.25rem}
+    .status-info-box{background:var(--surface-low);border-radius:0.875rem;padding:0.875rem 1rem;margin-bottom:1.125rem;border:1px solid rgba(199,196,216,0.3);text-align:left}
+    .status-row{display:flex;justify-content:space-between;align-items:center;font-size:0.8125rem}
+    .status-row+.status-row{margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid rgba(199,196,216,0.3)}
+    .status-label{color:var(--on-surface-variant);font-weight:500}
+    .status-value{font-weight:600;color:var(--on-surface)}
+    .status-value.green{color:var(--present-fg)}
+    .done-banner{background:var(--present-bg);border:1px solid rgba(46,125,50,0.2);border-radius:0.875rem;padding:0.875rem 1rem;display:flex;align-items:flex-start;gap:0.75rem;color:var(--present-fg);font-size:0.8125rem;font-weight:600;margin-bottom:1.125rem;text-align:left;line-height:1.5}
+    .done-banner svg{width:18px;height:18px;flex-shrink:0;margin-top:1px}
+    .btn-checkin{width:100%;padding:0.825rem;border-radius:0.75rem;font-size:0.9rem;font-weight:700;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:0.5rem;transition:opacity 0.2s,transform 0.15s;background:linear-gradient(135deg,#1b5e20,#2e7d32);color:#fff}
+    .btn-checkin.btn-checkout{background:linear-gradient(135deg,#bf360c,#e64a19)}
+    .btn-checkin:hover:not(:disabled){opacity:0.9;transform:translateY(-1px)}
+    .btn-checkin:disabled{opacity:0.55;cursor:not-allowed;transform:none}
+    .btn-checkin svg{width:17px;height:17px}
+    .btn-back{width:100%;padding:0.6rem;border-radius:0.625rem;border:none;background:none;color:var(--on-surface-variant);font-size:0.8125rem;font-weight:500;cursor:pointer;font-family:inherit;margin-top:0.5rem;display:flex;align-items:center;justify-content:center;gap:0.375rem;transition:color 0.15s}
+    .btn-back:hover{color:var(--primary)}
+    .btn-back svg{width:13px;height:13px}
 
-    .staff-confirm-card { text-align: center; padding: 0.25rem 0; }
-    .staff-avatar-lg {
-      width: 68px; height: 68px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--primary-container));
-      color: #fff; font-weight: 800; font-size: 1.6rem;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 0.875rem;
-      box-shadow: 0 6px 20px rgba(53,37,205,0.25);
-    }
-    .staff-confirm-name {
-      font-family: 'Manrope', sans-serif; font-weight: 700;
-      font-size: 1.2rem; color: var(--on-surface); margin-bottom: 0.2rem;
-    }
-    .staff-confirm-dept { font-size: 0.8125rem; color: var(--on-surface-variant); margin-bottom: 1.25rem; }
+    footer{text-align:center;padding:0.875rem;font-size:0.75rem;color:var(--on-surface-variant);border-top:1px solid rgba(199,196,216,0.2);background:var(--surface-lowest);position:relative;z-index:1}
+    footer strong{color:var(--primary);font-weight:600}
 
-    .status-info-box {
-      background: var(--surface-low); border-radius: 0.875rem;
-      padding: 0.875rem 1rem; margin-bottom: 1.125rem;
-      border: 1px solid rgba(199,196,216,0.3); text-align: left;
-    }
-    .status-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.8125rem; }
-    .status-row + .status-row {
-      margin-top: 0.5rem; padding-top: 0.5rem;
-      border-top: 1px solid rgba(199,196,216,0.3);
-    }
-    .status-label { color: var(--on-surface-variant); font-weight: 500; }
-    .status-value { font-weight: 600; color: var(--on-surface); }
-    .status-value.green { color: var(--present-fg); }
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
 
-    .done-banner {
-      background: var(--present-bg); border: 1px solid rgba(46,125,50,0.2);
-      border-radius: 0.875rem; padding: 0.875rem 1rem;
-      display: flex; align-items: flex-start; gap: 0.75rem;
-      color: var(--present-fg); font-size: 0.8125rem; font-weight: 600;
-      margin-bottom: 1.125rem; text-align: left; line-height: 1.5;
+    @media(max-width:960px){.left-panel{padding:2.5rem;}.panel-headline{font-size:2rem}}
+    @media(max-width:768px){
+      .page-wrapper{flex-direction:column}
+      .left-panel{width:100%;min-height:auto;padding:1.5rem 1.5rem 1.25rem}
+      .panel-body{padding:1rem 0 0.25rem}
+      .panel-headline{font-size:1.6rem;margin-bottom:0}
+      .panel-desc,.feature-list,.panel-footer-note{display:none}
+      .right-panel{padding:1.5rem 1.25rem 2rem;justify-content:flex-start}
+      .login-card{padding:1.75rem 1.5rem;max-width:100%}
     }
-    .done-banner svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
-
-    .btn-checkin {
-      width: 100%; padding: 0.825rem; border-radius: 0.75rem;
-      font-size: 0.9rem; font-weight: 700; border: none;
-      cursor: pointer; font-family: inherit;
-      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-      transition: opacity 0.2s, transform 0.15s;
-      background: linear-gradient(135deg, #1b5e20, #2e7d32); color: #fff;
-    }
-    .btn-checkin.btn-checkout { background: linear-gradient(135deg, #bf360c, #e64a19); }
-    .btn-checkin:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
-    .btn-checkin:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
-    .btn-checkin svg { width: 17px; height: 17px; }
-
-    .btn-back {
-      width: 100%; padding: 0.6rem; border-radius: 0.625rem;
-      border: none; background: none; color: var(--on-surface-variant);
-      font-size: 0.8125rem; font-weight: 500; cursor: pointer;
-      font-family: inherit; margin-top: 0.5rem;
-      display: flex; align-items: center; justify-content: center; gap: 0.375rem;
-      transition: color 0.15s;
-    }
-    .btn-back:hover { color: var(--primary); }
-    .btn-back svg { width: 13px; height: 13px; }
-
-    /* ── Footer ── */
-    footer {
-      text-align: center; padding: 0.875rem;
-      font-size: 0.75rem; color: var(--on-surface-variant);
-      border-top: 1px solid rgba(199,196,216,0.2);
-      background: var(--surface-lowest); position: relative; z-index: 1;
-    }
-    footer strong { color: var(--primary); font-weight: 600; }
-
-    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes spin   { to   { transform: rotate(360deg); } }
-
-    /* ── Responsive breakpoints ── */
-    @media (max-width: 960px) {
-      .left-panel { padding: 2.5rem; }
-      .panel-headline { font-size: 2rem; }
-    }
-
-    @media (max-width: 768px) {
-      .page-wrapper { flex-direction: column; }
-      .left-panel {
-        width: 100%; min-height: auto;
-        padding: 1.5rem 1.5rem 1.25rem;
-      }
-      .panel-body { padding: 1rem 0 0.25rem; }
-      .panel-headline { font-size: 1.6rem; margin-bottom: 0; }
-      .panel-desc { display: none; }
-      .feature-list { display: none; }
-      .panel-footer-note { display: none; }
-      .right-panel { padding: 1.5rem 1.25rem 2rem; justify-content: flex-start; }
-      .login-card { padding: 1.75rem 1.5rem; max-width: 100%; }
-    }
-
-    @media (max-width: 480px) {
-      .left-panel { padding: 1.25rem; }
-      .panel-eyebrow { margin-bottom: 0.5rem; font-size: 0.625rem; }
-      .panel-headline { font-size: 1.35rem; }
-      .right-panel { padding: 1.25rem 1rem 1.5rem; }
-      .login-card { padding: 1.5rem 1.125rem; border-radius: 1rem; }
-      .tab-btn { font-size: 0.75rem; padding: 0.5rem 0.25rem; gap: 0.25rem; }
-      .id-input { font-size: 1.5rem; padding: 0.75rem 0.875rem; }
-      .card-header h2 { font-size: 1.3rem; }
-      .staff-avatar-lg { width: 58px; height: 58px; font-size: 1.4rem; }
+    @media(max-width:480px){
+      .left-panel{padding:1.25rem}
+      .panel-eyebrow{margin-bottom:0.5rem;font-size:0.625rem}
+      .panel-headline{font-size:1.35rem}
+      .right-panel{padding:1.25rem 1rem 1.5rem}
+      .login-card{padding:1.5rem 1.125rem;border-radius:1rem}
+      .tab-btn{font-size:0.75rem;padding:0.5rem 0.25rem;gap:0.25rem}
+      .id-input{font-size:1.5rem;padding:0.75rem 0.875rem}
+      .card-header h2{font-size:1.3rem}
+      .staff-avatar-lg{width:58px;height:58px;font-size:1.4rem}
     }
   </style>
 </head>
 <body>
   <div class="page-wrapper">
 
-    <!-- ══ Left Panel ══ -->
+    <!-- Left Panel -->
     <div class="left-panel">
       <div class="brand">
         <div class="brand-mark">
           <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2"/>
-            <path d="M16 2v4M8 2v4M3 10h18"/>
-            <circle cx="12" cy="16" r="2"/>
+            <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><circle cx="12" cy="16" r="2"/>
           </svg>
         </div>
         <span class="brand-name">Attend<span>Sync</span></span>
@@ -376,54 +162,45 @@
         <p class="panel-desc">A premium workspace for tracking attendance, managing staff records, and generating intelligent reports — with precision and ease.</p>
         <div class="feature-list">
           <div class="feature-item"><div class="feature-dot"></div><span>Real-time check-in &amp; check-out tracking</span></div>
-          <div class="feature-item"><div class="feature-dot"></div><span>Staff portal with 6-digit ID access</span></div>
-          <div class="feature-item"><div class="feature-dot"></div><span>Filtered reports — daily, weekly, monthly</span></div>
-          <div class="feature-item"><div class="feature-dot"></div><span>Leave management &amp; approval workflows</span></div>
+          <div class="feature-item"><div class="feature-dot"></div><span>Night shift aware — 9 PM to 6 AM</span></div>
+          <div class="feature-item"><div class="feature-dot"></div><span>Auto working hours calculation</span></div>
+          <div class="feature-item"><div class="feature-dot"></div><span>Auto absent marking for missed shifts</span></div>
         </div>
       </div>
       <div class="panel-footer-note">Secure · Private · Always-on</div>
     </div>
 
-    <!-- ══ Right Panel ══ -->
+    <!-- Right Panel -->
     <div class="right-panel">
       <div class="login-card">
 
         <!-- Tabs -->
         <div class="tab-bar">
           <button class="tab-btn active" id="tabAdmin" onclick="switchTab('admin')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-            </svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
             Admin Login
           </button>
           <button class="tab-btn" id="tabStaff" onclick="switchTab('staff')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="9 11 12 14 22 4"/>
-              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-            </svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
             Staff Check-In
           </button>
         </div>
 
-        <!-- ══ ADMIN PANEL ══ -->
+        <!-- ADMIN PANEL -->
         <div class="admin-panel active" id="adminPanel">
           <div class="card-header">
             <h2>Welcome back</h2>
             <p>Sign in to your admin dashboard</p>
           </div>
           <div class="error-msg" id="adminErrorMsg">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-            </svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <span id="adminErrorText">Invalid email or password.</span>
           </div>
           <div class="form-group">
             <label for="email">Email address</label>
             <div class="input-wrap">
               <input id="email" class="form-input" type="email" placeholder="admin@company.com" autocomplete="email" required />
-              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/>
-              </svg>
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
             </div>
           </div>
           <div class="form-group">
@@ -431,9 +208,7 @@
             <div class="input-wrap">
               <input id="password" class="form-input" type="password" placeholder="••••••••" autocomplete="current-password" required />
               <button class="toggle-pw" id="togglePw" type="button" aria-label="Toggle password">
-                <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-                </svg>
+                <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
             </div>
             <div class="form-meta"><a href="#" onclick="return false;">Forgot password?</a></div>
@@ -445,15 +220,13 @@
           <div class="divider"><span>secured by</span></div>
           <div class="sso-note">
             <span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-              </svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               Supabase Auth — enterprise-grade security
             </span>
           </div>
         </div>
 
-        <!-- ══ STAFF PANEL ══ -->
+        <!-- STAFF PANEL -->
         <div class="staff-panel" id="staffPanel">
 
           <!-- Step 1: Enter ID -->
@@ -463,9 +236,7 @@
               <p>Enter your 6-digit Staff ID to check in or out</p>
             </div>
             <div class="error-msg" id="staffErrorMsg">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-              </svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
               <span id="staffErrorText">Staff ID not found.</span>
             </div>
             <div class="form-group">
@@ -478,7 +249,7 @@
             </button>
           </div>
 
-          <!-- Step 2: Confirm & Action -->
+          <!-- Step 2: Confirm -->
           <div class="confirm-screen" id="staffConfirmScreen">
             <div class="staff-confirm-card">
               <div class="staff-avatar-lg" id="confirmAvatar">—</div>
@@ -486,15 +257,13 @@
               <div class="staff-confirm-dept" id="confirmDept">—</div>
 
               <div class="done-banner" id="doneBanner" style="display:none">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                 <span id="doneBannerText">Attendance already completed for today.</span>
               </div>
 
               <div class="status-info-box">
                 <div class="status-row">
-                  <span class="status-label">Today's Date</span>
+                  <span class="status-label">Shift Date</span>
                   <span class="status-value" id="confirmDate">—</span>
                 </div>
                 <div class="status-row">
@@ -505,20 +274,20 @@
                   <span class="status-label">Check-Out</span>
                   <span class="status-value" id="confirmCheckout">Not yet</span>
                 </div>
+                <div class="status-row" id="hoursRow" style="display:none">
+                  <span class="status-label">Hours Worked</span>
+                  <span class="status-value green" id="confirmHours">—</span>
+                </div>
               </div>
 
               <button class="btn-checkin" id="actionBtn" type="button" onclick="doCheckAction()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="actionIcon">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="actionIcon"><polyline points="20 6 9 17 4 12"/></svg>
                 <span id="actionBtnText">Check In</span>
                 <div class="spinner" id="actionSpinner" style="display:none"></div>
               </button>
 
               <button class="btn-back" onclick="resetStaffPanel()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
-                </svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
                 Use a different ID
               </button>
             </div>
@@ -536,34 +305,80 @@
   <script>
     const sb = supabase.createClient(window.__SUPA_URL, window.__SUPA_ANON);
 
-    // Redirect if already admin-logged-in
+    // Redirect if already logged in as admin
     (async () => {
       const { data: { session } } = await sb.auth.getSession();
       if (session) window.location.href = 'dashboard.html';
     })();
 
-    /* ─────────────────────────────────────────────────
-       AM/PM helper
-       Input : "HH:MM" or "HH:MM:SS"  (24-hr string)
-       Output: "h:MM AM" / "h:MM PM"
-    ───────────────────────────────────────────────── */
-    function toAmPm(timeStr) {
-      if (!timeStr) return 'Not yet';
-      const parts = timeStr.split(':');
-      let h = parseInt(parts[0], 10);
-      const m = (parts[1] || '00').padStart(2, '0');
+    /* ═══════════════════════════════════════════════
+       NIGHT SHIFT CONFIG
+       Shift  : 9 PM (21:00) → 6 AM (06:00) next day
+       Reset  : 9 AM (09:00) — before 9 AM the portal
+                still belongs to last night's shift.
+       The "shift date" is always the date the shift STARTED.
+    ═══════════════════════════════════════════════ */
+    const SHIFT_START = 21; // 9 PM  — shift begins
+    const SHIFT_END   =  6; // 6 AM  — shift ends
+    const DAY_RESET   =  9; // 9 AM  — portal resets to new shift day
+
+    /**
+     * Returns the shift-start date for the current moment.
+     *
+     * 00:00–08:59  → yesterday  (mid-shift OR post-shift wind-down)
+     * 09:00–23:59  → today      (upcoming shift / active from 9 PM)
+     *
+     * This means a staff member checking out at 4 AM on Tuesday
+     * gets their record saved under Monday's date — correct!
+     * And a staff member checking in at 10 PM Monday also saves
+     * under Monday. Consistent.
+     */
+    function getShiftDate() {
+      const now  = new Date();
+      const hour = now.getHours();
+      // Before 9 AM → still last night's shift
+      if (hour < DAY_RESET) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - 1);
+        return d.toISOString().slice(0, 10);
+      }
+      // 9 AM and later → today is the shift date
+      return now.toISOString().slice(0, 10);
+    }
+
+    /* ═══════════════════════════════════════════════
+       HELPERS
+    ═══════════════════════════════════════════════ */
+    function toAmPm(t) {
+      if (!t) return null;
+      const [hStr, mStr] = t.split(':');
+      let h = parseInt(hStr, 10);
+      const m = (mStr || '00').padStart(2, '0');
       const period = h >= 12 ? 'PM' : 'AM';
-      h = h % 12 || 12; // 0 → 12, 13 → 1, 12 → 12
+      h = h % 12 || 12;
       return `${h}:${m} ${period}`;
     }
 
-    /* Current time as "HH:MM" for DB storage */
     function nowTime24() {
       const n = new Date();
       return String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
     }
 
-    /* ══════════ TAB SWITCHING ══════════ */
+    function calcWorkingHours(checkIn, checkOut) {
+      if (!checkIn || !checkOut) return null;
+      const toMins = t => { const [h,m] = t.split(':').map(Number); return h*60+m; };
+      let inM  = toMins(checkIn);
+      let outM = toMins(checkOut);
+      if (outM <= inM) outM += 24 * 60; // crossed midnight
+      const diff = outM - inM;
+      if (diff <= 0 || diff > 24*60) return null;
+      const h = Math.floor(diff/60), m = diff%60;
+      return m > 0 ? `${h}h ${m}m` : `${h}h`;
+    }
+
+    /* ═══════════════════════════════════════════════
+       TAB SWITCHING
+    ═══════════════════════════════════════════════ */
     function switchTab(tab) {
       const isAdmin = tab === 'admin';
       document.getElementById('tabAdmin').classList.toggle('active', isAdmin);
@@ -573,7 +388,9 @@
       if (!isAdmin) { resetStaffPanel(); setTimeout(() => document.getElementById('staffIdInput').focus(), 120); }
     }
 
-    /* ══════════ ADMIN LOGIN ══════════ */
+    /* ═══════════════════════════════════════════════
+       ADMIN LOGIN
+    ═══════════════════════════════════════════════ */
     const emailInput    = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     const loginBtn      = document.getElementById('loginBtn');
@@ -590,48 +407,49 @@
         : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
     });
 
-    function showAdminError(msg) { adminErrorText.textContent = msg; adminErrorMsg.classList.add('show'); }
+    function showAdminError(msg) { adminErrorText.textContent=msg; adminErrorMsg.classList.add('show'); }
     function hideAdminError()    { adminErrorMsg.classList.remove('show'); }
 
     loginBtn.addEventListener('click', async () => {
       hideAdminError();
-      const email    = emailInput.value.trim();
-      const password = passwordInput.value;
-      if (!email || !password) { showAdminError('Please enter your email and password.'); return; }
-      loginBtn.disabled = true; loginBtn.classList.add('loading');
+      const email=emailInput.value.trim(), password=passwordInput.value;
+      if (!email||!password) { showAdminError('Please enter your email and password.'); return; }
+      loginBtn.disabled=true; loginBtn.classList.add('loading');
       try {
         const { error } = await sb.auth.signInWithPassword({ email, password });
         if (error) throw error;
         window.location.href = 'dashboard.html';
-      } catch (err) {
-        showAdminError(err.message || 'Invalid email or password. Please try again.');
+      } catch(err) {
+        showAdminError(err.message||'Invalid email or password.');
       } finally {
-        loginBtn.disabled = false; loginBtn.classList.remove('loading');
+        loginBtn.disabled=false; loginBtn.classList.remove('loading');
       }
     });
-
-    [emailInput, passwordInput].forEach(el => {
-      el.addEventListener('keydown', e => { if (e.key === 'Enter') loginBtn.click(); });
+    [emailInput,passwordInput].forEach(el => {
+      el.addEventListener('keydown', e => { if(e.key==='Enter') loginBtn.click(); });
       el.addEventListener('input', hideAdminError);
     });
 
-    /* ══════════ STAFF CHECK-IN / OUT ══════════ */
+    /* ═══════════════════════════════════════════════
+       STAFF CHECK-IN / OUT  (Night Shift Aware)
+    ═══════════════════════════════════════════════ */
     let currentStaff   = null;
     let existingRecord = null;
+    let currentShiftDate = null;
 
     const staffIdInput   = document.getElementById('staffIdInput');
     const staffLookupBtn = document.getElementById('staffLookupBtn');
     const staffErrorMsg  = document.getElementById('staffErrorMsg');
     const staffErrorText = document.getElementById('staffErrorText');
 
-    function showStaffError(msg) { staffErrorText.textContent = msg; staffErrorMsg.classList.add('show'); }
+    function showStaffError(msg) { staffErrorText.textContent=msg; staffErrorMsg.classList.add('show'); }
     function hideStaffError()    { staffErrorMsg.classList.remove('show'); }
 
     staffIdInput.addEventListener('input', () => {
-      staffIdInput.value = staffIdInput.value.replace(/\D/g, '').slice(0, 6);
+      staffIdInput.value = staffIdInput.value.replace(/\D/g,'').slice(0,6);
       hideStaffError();
     });
-    staffIdInput.addEventListener('keydown', e => { if (e.key === 'Enter') staffLookupBtn.click(); });
+    staffIdInput.addEventListener('keydown', e => { if(e.key==='Enter') staffLookupBtn.click(); });
 
     staffLookupBtn.addEventListener('click', async () => {
       const code = staffIdInput.value.trim();
@@ -642,6 +460,7 @@
       hideStaffError();
 
       try {
+        // 1. Look up staff
         const { data: staffData, error: staffErr } = await sb
           .from('staff')
           .select('id, name, department, role, staff_code')
@@ -649,21 +468,23 @@
           .single();
 
         if (staffErr || !staffData) { showStaffError('Staff ID not found. Please check and try again.'); return; }
-
         currentStaff = staffData;
 
-        const today = new Date().toISOString().slice(0, 10);
+        // 2. Determine shift date (handles midnight crossing)
+        currentShiftDate = getShiftDate();
+
+        // 3. Look for existing record on shift date
         const { data: attData } = await sb
           .from('attendance')
           .select('*')
           .eq('staff_id', staffData.id)
-          .eq('date', today)
+          .eq('date', currentShiftDate)
           .maybeSingle();
 
         existingRecord = attData || null;
-        showConfirmScreen(today);
+        showConfirmScreen();
 
-      } catch (err) {
+      } catch(err) {
         showStaffError('Error looking up staff. Please try again.');
         console.error(err);
       } finally {
@@ -672,17 +493,19 @@
       }
     });
 
-    function showConfirmScreen(today) {
+    function showConfirmScreen() {
       document.getElementById('staffFormScreen').classList.add('hide');
       document.getElementById('staffConfirmScreen').classList.add('show');
 
-      // Staff info
       document.getElementById('confirmAvatar').textContent = currentStaff.name[0].toUpperCase();
       document.getElementById('confirmName').textContent   = currentStaff.name;
       document.getElementById('confirmDept').textContent   =
         [currentStaff.department, currentStaff.role].filter(Boolean).join(' · ') || 'Staff Member';
-      document.getElementById('confirmDate').textContent   =
-        new Date().toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+
+      // Show shift date in readable format
+      const fmtDate = new Date(currentShiftDate + 'T12:00:00')
+        .toLocaleDateString('en-GB', { weekday:'short', day:'2-digit', month:'short', year:'numeric' });
+      document.getElementById('confirmDate').textContent = fmtDate;
 
       const rec        = existingRecord;
       const actionBtn  = document.getElementById('actionBtn');
@@ -690,18 +513,27 @@
       const actionText = document.getElementById('actionBtnText');
       const doneBanner = document.getElementById('doneBanner');
       const spinner    = document.getElementById('actionSpinner');
+      const hoursRow   = document.getElementById('hoursRow');
 
-      // Reset button state
       spinner.style.display    = 'none';
       actionText.style.display = 'inline';
 
-      // ── Show times in AM/PM ──
+      // Times in AM/PM
       const cinEl  = document.getElementById('confirmCheckin');
       const coutEl = document.getElementById('confirmCheckout');
       cinEl.textContent  = rec?.check_in  ? toAmPm(rec.check_in)  : 'Not yet';
       coutEl.textContent = rec?.check_out ? toAmPm(rec.check_out) : 'Not yet';
       cinEl.className    = rec?.check_in  ? 'status-value green' : 'status-value';
       coutEl.className   = rec?.check_out ? 'status-value green' : 'status-value';
+
+      // Working hours row
+      const hrs = calcWorkingHours(rec?.check_in, rec?.check_out);
+      if (hrs) {
+        document.getElementById('confirmHours').textContent = hrs;
+        hoursRow.style.display = 'flex';
+      } else {
+        hoursRow.style.display = 'none';
+      }
 
       doneBanner.style.display = 'none';
       actionBtn.style.display  = 'flex';
@@ -715,14 +547,18 @@
       } else if (rec.check_in && !rec.check_out) {
         actionBtn.className    = 'btn-checkin btn-checkout';
         actionText.textContent = 'Check Out Now';
-        actionIcon.innerHTML   = `<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>`;
+        actionIcon.innerHTML   = `<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>`;
 
       } else {
-        // Both done
+        // Both done — show summary
         actionBtn.style.display  = 'none';
         doneBanner.style.display = 'flex';
+        const doneHrs = calcWorkingHours(rec.check_in, rec.check_out);
         document.getElementById('doneBannerText').textContent =
-          `All done for today!  In: ${toAmPm(rec.check_in)}  ·  Out: ${toAmPm(rec.check_out)}`;
+          `Shift complete! In: ${toAmPm(rec.check_in)}  ·  Out: ${toAmPm(rec.check_out)}` +
+          (doneHrs ? `  ·  ${doneHrs} worked` : '');
       }
     }
 
@@ -738,14 +574,18 @@
       spinner.style.display    = 'block';
 
       try {
-        const timeStr = nowTime24(); // "HH:MM" — stored in DB as 24-hr
-        const today   = new Date().toISOString().slice(0, 10);
+        const timeStr = nowTime24(); // stored as 24-hr in DB
 
         if (isCheckIn) {
+          // Insert new record using SHIFT date (not necessarily today's calendar date)
           const payload = {
-            staff_id: currentStaff.id, date: today,
-            status: 'Present', check_in: timeStr,
-            check_out: null, notes: null, source: 'staff',
+            staff_id:  currentStaff.id,
+            date:      currentShiftDate, // ← shift start date, handles midnight crossing
+            status:    'Present',
+            check_in:  timeStr,
+            check_out: null,
+            notes:     null,
+            source:    'staff',
           };
           const { error } = await sb.from('attendance').upsert(payload, {
             onConflict: 'staff_id,date', ignoreDuplicates: false,
@@ -754,6 +594,7 @@
           existingRecord = { ...payload };
 
         } else {
+          // Update check_out on existing record
           const { error } = await sb
             .from('attendance')
             .update({ check_out: timeStr })
@@ -762,9 +603,9 @@
           existingRecord = { ...rec, check_out: timeStr };
         }
 
-        showConfirmScreen(today);
+        showConfirmScreen();
 
-      } catch (err) {
+      } catch(err) {
         console.error(err);
         alert('Error saving attendance: ' + err.message);
         actionBtn.disabled       = false;
@@ -774,7 +615,7 @@
     }
 
     function resetStaffPanel() {
-      currentStaff = null; existingRecord = null;
+      currentStaff = null; existingRecord = null; currentShiftDate = null;
       staffIdInput.value = '';
       hideStaffError();
       document.getElementById('staffFormScreen').classList.remove('hide');

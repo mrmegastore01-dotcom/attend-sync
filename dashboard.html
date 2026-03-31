@@ -19,6 +19,7 @@
       --present-bg:#e8f5e9; --present-fg:#2e7d32;
       --absent-bg:#fce4ec;  --absent-fg:#c62828;
       --leave-bg:#fff3e0;   --leave-fg:#ef6c00;
+      --hours-bg:#e8eaf6;   --hours-fg:#283593;
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Inter',sans-serif;background:var(--background);color:var(--on-surface);min-height:100vh;display:flex;flex-direction:column}
@@ -27,52 +28,85 @@
     .page-body{flex:1;padding:2rem;overflow-y:auto}
 
     /* Stats grid */
-    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.25rem;margin-bottom:2rem}
-    .stat-card{background:var(--surface-lowest);border-radius:1rem;padding:1.5rem;border:1px solid rgba(199,196,216,0.2);box-shadow:0 2px 8px var(--shadow-tinted);display:flex;align-items:center;gap:1.25rem;transition:transform 0.15s;animation:fadeUp 0.5s ease both}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.25rem;margin-bottom:2rem}
+    .stat-card{background:var(--surface-lowest);border-radius:1rem;padding:1.25rem 1.5rem;border:1px solid rgba(199,196,216,0.2);box-shadow:0 2px 8px var(--shadow-tinted);display:flex;align-items:center;gap:1rem;transition:transform 0.15s;animation:fadeUp 0.5s ease both}
     .stat-card:hover{transform:translateY(-2px)}
     .stat-card:nth-child(1){animation-delay:0.05s}.stat-card:nth-child(2){animation-delay:0.1s}.stat-card:nth-child(3){animation-delay:0.15s}.stat-card:nth-child(4){animation-delay:0.2s}
-    .stat-icon{width:52px;height:52px;border-radius:0.875rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .stat-icon svg{width:24px;height:24px}
+    .stat-icon{width:48px;height:48px;border-radius:0.875rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .stat-icon svg{width:22px;height:22px}
     .stat-icon.blue{background:rgba(53,37,205,0.1);color:var(--primary)}
     .stat-icon.green{background:var(--present-bg);color:var(--present-fg)}
     .stat-icon.red{background:var(--absent-bg);color:var(--absent-fg)}
     .stat-icon.orange{background:var(--leave-bg);color:var(--leave-fg)}
-    .stat-body{flex:1}
-    .stat-label{font-size:0.75rem;font-weight:600;color:var(--on-surface-variant);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.35rem}
-    .stat-value{font-family:'Manrope',sans-serif;font-weight:800;font-size:2rem;letter-spacing:-0.03em;color:var(--on-surface);line-height:1}
+    .stat-body{flex:1;min-width:0}
+    .stat-label{font-size:0.7rem;font-weight:700;color:var(--on-surface-variant);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.3rem}
+    .stat-value{font-family:'Manrope',sans-serif;font-weight:800;font-size:1.875rem;letter-spacing:-0.03em;color:var(--on-surface);line-height:1}
     .stat-sub{font-size:0.75rem;color:var(--on-surface-variant);margin-top:0.3rem}
 
-    /* Recent section */
+    /* Section headers */
     .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
-    .section-title{font-family:'Manrope',sans-serif;font-weight:700;font-size:1.05rem;color:var(--on-surface)}
-    .btn-sm{padding:0.45rem 1rem;border-radius:0.5rem;font-size:0.8125rem;font-weight:600;text-decoration:none;cursor:pointer;border:none;font-family:inherit;transition:opacity 0.15s}
+    .section-title{font-family:'Manrope',sans-serif;font-weight:700;font-size:1rem;color:var(--on-surface)}
+    .btn-sm{padding:0.45rem 1rem;border-radius:0.5rem;font-size:0.8125rem;font-weight:600;text-decoration:none;cursor:pointer;border:none;font-family:inherit;transition:opacity 0.15s;display:inline-flex;align-items:center;gap:0.4rem}
     .btn-sm.primary{background:var(--primary);color:#fff}.btn-sm.primary:hover{opacity:0.88}
     .btn-sm.ghost{background:var(--surface-low);color:var(--primary)}.btn-sm.ghost:hover{opacity:0.8}
 
-    /* Table */
-    .table-card{background:var(--surface-lowest);border-radius:1rem;border:1px solid rgba(199,196,216,0.2);box-shadow:0 2px 8px var(--shadow-tinted);overflow:hidden;animation:fadeUp 0.5s 0.25s ease both}
+    /* Table card */
+    .table-card{background:var(--surface-lowest);border-radius:1rem;border:1px solid rgba(199,196,216,0.2);box-shadow:0 2px 8px var(--shadow-tinted);overflow:hidden;animation:fadeUp 0.5s 0.2s ease both}
     .table-wrap{overflow-x:auto}
     table{width:100%;border-collapse:collapse}
-    th{padding:0.75rem 1.25rem;text-align:left;font-size:0.75rem;font-weight:700;color:var(--on-surface-variant);text-transform:uppercase;letter-spacing:0.07em;background:var(--surface-low);border-bottom:1px solid rgba(199,196,216,0.2)}
-    td{padding:0.875rem 1.25rem;font-size:0.875rem;border-bottom:1px solid rgba(199,196,216,0.1);vertical-align:middle}
+    th{padding:0.7rem 1rem;text-align:left;font-size:0.7rem;font-weight:700;color:var(--on-surface-variant);text-transform:uppercase;letter-spacing:0.07em;background:var(--surface-low);border-bottom:1px solid rgba(199,196,216,0.2);white-space:nowrap}
+    td{padding:0.75rem 1rem;font-size:0.8125rem;border-bottom:1px solid rgba(199,196,216,0.1);vertical-align:middle}
     tr:last-child td{border-bottom:none}
-    tr:hover td{background:var(--surface-low)}
-    .badge{display:inline-flex;align-items:center;gap:0.3rem;padding:0.25rem 0.625rem;border-radius:99px;font-size:0.75rem;font-weight:600}
+    tr:hover td{background:rgba(239,243,255,0.5)}
+
+    /* Badges */
+    .badge{display:inline-flex;align-items:center;padding:0.2rem 0.6rem;border-radius:99px;font-size:0.7rem;font-weight:700;white-space:nowrap}
     .badge.present{background:var(--present-bg);color:var(--present-fg)}
     .badge.absent{background:var(--absent-bg);color:var(--absent-fg)}
     .badge.leave{background:var(--leave-bg);color:var(--leave-fg)}
 
+    /* Working hours pill */
+    .hours-pill{display:inline-flex;align-items:center;gap:0.3rem;background:var(--hours-bg);color:var(--hours-fg);padding:0.2rem 0.6rem;border-radius:99px;font-size:0.7rem;font-weight:700;white-space:nowrap}
+    .hours-pill svg{width:11px;height:11px}
+    .hours-pending{color:var(--on-surface-variant);font-size:0.75rem;font-style:italic}
+
+    /* Time cell */
+    .time-cell{font-size:0.8rem;font-weight:600;color:var(--on-surface)}
+    .time-cell.dim{color:var(--on-surface-variant);font-weight:400;font-style:italic}
+
+    /* Auto-absent badge */
+    .badge.auto-absent{background:#fff8e1;color:#f57f17;border:1px solid rgba(245,127,23,0.25)}
+
     /* Two-col layout */
     .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
 
-    /* Empty state */
-    .empty-state{padding:3rem 2rem;text-align:center;color:var(--on-surface-variant);font-size:0.875rem}
-    .skeleton{background:linear-gradient(90deg,var(--surface-low) 25%,var(--surface-high) 50%,var(--surface-low) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:0.5rem;height:1rem;width:80%}
-    @keyframes shimmer{to{background-position:-200% 0}}
+    /* Empty / loading */
+    .empty-state{padding:2.5rem 2rem;text-align:center;color:var(--on-surface-variant);font-size:0.875rem}
+
+    /* Night shift info banner */
+    .shift-banner{
+      display:flex;align-items:center;gap:0.75rem;
+      background:linear-gradient(135deg,rgba(53,37,205,0.06),rgba(79,70,229,0.04));
+      border:1px solid rgba(53,37,205,0.15);
+      border-radius:0.875rem;padding:0.875rem 1.25rem;
+      margin-bottom:1.5rem;font-size:0.8125rem;color:var(--on-surface-variant);
+      animation:fadeUp 0.4s ease both;
+    }
+    .shift-banner svg{width:18px;height:18px;color:var(--primary);flex-shrink:0}
+    .shift-banner strong{color:var(--primary)}
+
     @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    @media(max-width:900px){.main-content{margin-left:0}.two-col{grid-template-columns:1fr}}
+    @media(max-width:900px){
+      .main-content{margin-left:0}
+      .two-col{grid-template-columns:1fr}
+    }
+    @media(max-width:600px){
+      .page-body{padding:1rem}
+      .stats-grid{grid-template-columns:1fr 1fr;gap:0.75rem}
+      .stat-value{font-size:1.5rem}
+    }
   </style>
 </head>
 <body>
@@ -81,6 +115,18 @@
   <div class="main-content">
     <div id="headerContainer"></div>
     <div class="page-body">
+
+      <!-- Night Shift Info Banner -->
+      <div class="shift-banner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <span>
+          <strong>Night Shift Mode</strong> — Shift: <strong>9:00 PM → 6:00 AM</strong> &nbsp;·&nbsp; Auto-absent fires at <strong>11:00 PM</strong> for no-shows &nbsp;·&nbsp; Dashboard resets at <strong>9:00 AM</strong>.
+          <span id="shiftDateLabel"></span>
+        </span>
+      </div>
+
       <!-- Stats -->
       <div class="stats-grid">
         <div class="stat-card">
@@ -98,7 +144,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
           <div class="stat-body">
-            <div class="stat-label">Present Today</div>
+            <div class="stat-label">Present (Shift)</div>
             <div class="stat-value" id="statPresent">—</div>
             <div class="stat-sub" id="statPresentPct">—</div>
           </div>
@@ -108,7 +154,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </div>
           <div class="stat-body">
-            <div class="stat-label">Absent Today</div>
+            <div class="stat-label">Absent (Auto)</div>
             <div class="stat-value" id="statAbsent">—</div>
             <div class="stat-sub" id="statAbsentPct">—</div>
           </div>
@@ -118,7 +164,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
           </div>
           <div class="stat-body">
-            <div class="stat-label">On Leave Today</div>
+            <div class="stat-label">On Leave</div>
             <div class="stat-value" id="statLeave">—</div>
             <div class="stat-sub">Approved leaves</div>
           </div>
@@ -127,23 +173,37 @@
 
       <!-- Two column -->
       <div class="two-col">
-        <!-- Recent attendance -->
+
+        <!-- Today's / Current Shift Attendance -->
         <div>
           <div class="section-header">
-            <span class="section-title">Today's Attendance</span>
-            <a href="attendance.html" class="btn-sm primary">Mark Attendance</a>
+            <span class="section-title" id="attTableTitle">Current Shift Attendance</span>
+            <a href="attendance.html" class="btn-sm primary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><polyline points="20 6 9 17 4 12"/></svg>
+              Mark Attendance
+            </a>
           </div>
           <div class="table-card">
             <div class="table-wrap">
               <table>
-                <thead><tr><th>Staff</th><th>Status</th><th>Check-in</th></tr></thead>
-                <tbody id="todayAttBody"><tr><td colspan="3" class="empty-state">Loading…</td></tr></tbody>
+                <thead>
+                  <tr>
+                    <th>Staff</th>
+                    <th>Status</th>
+                    <th>In</th>
+                    <th>Out</th>
+                    <th>Hours</th>
+                  </tr>
+                </thead>
+                <tbody id="todayAttBody">
+                  <tr><td colspan="5" class="empty-state">Loading…</td></tr>
+                </tbody>
               </table>
             </div>
           </div>
         </div>
 
-        <!-- Staff list preview -->
+        <!-- Staff Overview -->
         <div>
           <div class="section-header">
             <span class="section-title">Staff Overview</span>
@@ -153,11 +213,14 @@
             <div class="table-wrap">
               <table>
                 <thead><tr><th>Name</th><th>Department</th><th>Role</th></tr></thead>
-                <tbody id="staffPreviewBody"><tr><td colspan="3" class="empty-state">Loading…</td></tr></tbody>
+                <tbody id="staffPreviewBody">
+                  <tr><td colspan="3" class="empty-state">Loading…</td></tr>
+                </tbody>
               </table>
             </div>
           </div>
         </div>
+
       </div>
     </div>
     <div id="footerContainer"></div>
@@ -171,72 +234,372 @@
   injectSharedCSS();
   const sb = getSupabase();
 
+  /* ═══════════════════════════════════════════════════
+     NIGHT SHIFT CONFIG
+     ─────────────────────────────────────────────────
+     Shift window : 9 PM (21:00) → 6 AM (06:00)
+     Auto-absent  : 11 PM (23:00) — 2 hrs after shift start
+     Shift date   : always the calendar date the shift STARTED
+     Day boundary : 9 AM (09:00) — before 9 AM admin still
+                    sees the previous night's shift; from 9 AM
+                    onwards the view resets to "awaiting tonight"
+     ─────────────────────────────────────────────────
+     Time zones / hour breakdown:
+       00:00–05:59  → mid-shift (started last night)  → shiftDate = YESTERDAY
+       06:00–08:59  → shift just ended, transition     → shiftDate = YESTERDAY  (live=false)
+       09:00–20:59  → daytime, between shifts          → shiftDate = TODAY (upcoming)
+       21:00–23:59  → shift started tonight            → shiftDate = TODAY  (live=true)
+  ═══════════════════════════════════════════════════ */
+
+  const SHIFT_START_HOUR  = 21; // 9 PM  — shift begins
+  const SHIFT_END_HOUR    =  6; // 6 AM  — shift ends
+  const AUTO_ABSENT_HOUR  = 23; // 11 PM — mark absent if not checked in by now
+  const DAY_BOUNDARY_HOUR =  9; // 9 AM  — admin view resets to new shift day
+
+  /**
+   * Returns the shift date string "YYYY-MM-DD" for the CURRENT context.
+   * This is the date the shift STARTED (or will start tonight).
+   */
+  function getShiftDate() {
+    const now  = new Date();
+    const hour = now.getHours();
+
+    // 00:00–05:59 → still in last night's shift
+    if (hour < SHIFT_END_HOUR) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - 1);
+      return d.toISOString().slice(0, 10);
+    }
+
+    // 06:00–08:59 → shift just ended, keep showing yesterday until 9 AM
+    if (hour < DAY_BOUNDARY_HOUR) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - 1);
+      return d.toISOString().slice(0, 10);
+    }
+
+    // 09:00–23:59 → today is current/upcoming shift date
+    return now.toISOString().slice(0, 10);
+  }
+
+  /**
+   * Returns true only while the shift is actively running (9 PM → 6 AM).
+   */
+  function isShiftLive() {
+    const h = new Date().getHours();
+    return h >= SHIFT_START_HOUR || h < SHIFT_END_HOUR;
+  }
+
+  /**
+   * Returns true when it is past the auto-absent threshold (11 PM)
+   * AND the shift is live (i.e. 11 PM–5:59 AM).
+   */
+  function isPastAutoAbsentTime() {
+    const h = new Date().getHours();
+    // 23:00–23:59 or 00:00–05:59 (midnight crossover still in shift)
+    return (h >= AUTO_ABSENT_HOUR) || (h < SHIFT_END_HOUR);
+  }
+
+  /* ═══════════════════════════════════════════════════
+     AM/PM formatter
+  ═══════════════════════════════════════════════════ */
+  function toAmPm(t) {
+    if (!t) return null;
+    const [hStr, mStr] = t.split(':');
+    let h = parseInt(hStr, 10);
+    const m = (mStr || '00').padStart(2, '0');
+    const period = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return `${h}:${m} ${period}`;
+  }
+
+  /* ═══════════════════════════════════════════════════
+     WORKING HOURS CALCULATOR
+     Handles midnight crossover for night shift.
+     check_in  e.g. "21:30"
+     check_out e.g. "05:45" (next calendar day)
+  ═══════════════════════════════════════════════════ */
+  function calcWorkingHours(checkIn, checkOut) {
+    if (!checkIn || !checkOut) return null;
+
+    const toMins = (t) => {
+      const [h, m] = t.split(':').map(Number);
+      return h * 60 + m;
+    };
+
+    let inMins  = toMins(checkIn);
+    let outMins = toMins(checkOut);
+
+    // Night shift: if check-out is earlier in the day than check-in,
+    // it crossed midnight — add 24 hours to check-out
+    if (outMins <= inMins) {
+      outMins += 24 * 60;
+    }
+
+    const totalMins = outMins - inMins;
+    if (totalMins <= 0 || totalMins > 24 * 60) return null; // sanity check
+
+    const h = Math.floor(totalMins / 60);
+    const m = totalMins % 60;
+    return m > 0 ? `${h}h ${m}m` : `${h}h`;
+  }
+
+  /* ═══════════════════════════════════════════════════
+     AUTO ABSENT  — Two-tier logic
+     ─────────────────────────────────────────────────
+     Tier 1 — LIVE shift, past 11 PM (23:00):
+       It is now 2 hours into tonight's shift and a
+       staff member still hasn't checked in.
+       → Mark them Absent on TONIGHT's shift date.
+       Only runs if isPastAutoAbsentTime() is true.
+
+     Tier 2 — Previous completed shift:
+       Any staff with no record on the last fully
+       completed shift date get marked Absent.
+       This covers admins who open the dashboard
+       during the day (9 AM–9 PM).
+     ─────────────────────────────────────────────────
+     Both tiers use ignoreDuplicates:true so they
+     NEVER overwrite a record already set by staff
+     check-in, admin marking, or a previous auto run.
+  ═══════════════════════════════════════════════════ */
+  async function runAutoAbsent(allStaff) {
+    const now  = new Date();
+    const h    = now.getHours();
+    let totalMarked = 0;
+
+    /* ── Tier 1: Current shift, past 11 PM threshold ── */
+    if (isPastAutoAbsentTime()) {
+      const currentShiftDate = getShiftDate();
+
+      try {
+        const { data: existing } = await sb
+          .from('attendance')
+          .select('staff_id')
+          .eq('date', currentShiftDate);
+
+        const markedIds = new Set((existing || []).map(r => r.staff_id));
+        // Only mark staff who have NO record at all for tonight
+        const missing = allStaff.filter(s => !markedIds.has(s.id));
+
+        if (missing.length) {
+          const absents = missing.map(s => ({
+            staff_id:  s.id,
+            date:      currentShiftDate,
+            status:    'Absent',
+            check_in:  null,
+            check_out: null,
+            notes:     `Auto-absent: did not check in by ${AUTO_ABSENT_HOUR}:00`,
+            source:    'auto',
+          }));
+
+          const { error } = await sb.from('attendance').upsert(absents, {
+            onConflict: 'staff_id,date',
+            ignoreDuplicates: true,
+          });
+          if (error) console.warn('Auto-absent tier 1 error:', error.message);
+          else totalMarked += missing.length;
+        }
+      } catch (e) {
+        console.warn('Auto-absent tier 1 failed:', e.message);
+      }
+    }
+
+    /* ── Tier 2: Previous fully-completed shift ── */
+    // Calculate previous shift date
+    let prevShiftDate;
+    if (h < SHIFT_END_HOUR) {
+      // 00:00–05:59: in current shift; previous = 2 nights ago
+      const d = new Date(now); d.setDate(d.getDate() - 2);
+      prevShiftDate = d.toISOString().slice(0, 10);
+    } else if (h < DAY_BOUNDARY_HOUR) {
+      // 06:00–08:59: shift just ended; previous = yesterday (same shift we just saw)
+      // Skip tier 2 here — tier 1 already covered tonight's shift above
+      prevShiftDate = null;
+    } else {
+      // 09:00–23:59: daytime or early shift; previous = yesterday
+      const d = new Date(now); d.setDate(d.getDate() - 1);
+      prevShiftDate = d.toISOString().slice(0, 10);
+    }
+
+    if (prevShiftDate) {
+      try {
+        const { data: existing } = await sb
+          .from('attendance')
+          .select('staff_id')
+          .eq('date', prevShiftDate);
+
+        const markedIds = new Set((existing || []).map(r => r.staff_id));
+        const missing   = allStaff.filter(s => !markedIds.has(s.id));
+
+        if (missing.length) {
+          const absents = missing.map(s => ({
+            staff_id:  s.id,
+            date:      prevShiftDate,
+            status:    'Absent',
+            check_in:  null,
+            check_out: null,
+            notes:     'Auto-marked absent (shift ended)',
+            source:    'auto',
+          }));
+
+          const { error } = await sb.from('attendance').upsert(absents, {
+            onConflict: 'staff_id,date',
+            ignoreDuplicates: true,
+          });
+          if (error) console.warn('Auto-absent tier 2 error:', error.message);
+          else totalMarked += missing.length;
+        }
+      } catch (e) {
+        console.warn('Auto-absent tier 2 failed:', e.message);
+      }
+    }
+
+    return totalMarked;
+  }
+
+  /* ═══════════════════════════════════════════════════
+     MAIN DASHBOARD LOAD
+  ═══════════════════════════════════════════════════ */
   (async () => {
     const session = await requireAuth();
     if (!session) return;
 
     document.getElementById('sidebarContainer').innerHTML = renderSidebar('dashboard', session.user.email);
-    document.getElementById('headerContainer').innerHTML  = renderHeader('Dashboard', 'Welcome back — here\'s what\'s happening today');
+    document.getElementById('headerContainer').innerHTML  = renderHeader('Dashboard', "Welcome back — here's what's happening tonight");
     document.getElementById('footerContainer').innerHTML  = renderFooter();
 
     await loadDashboard();
   })();
 
   async function loadDashboard() {
-    const today = todayISO();
+    const shiftDate = getShiftDate();
+    const live      = isShiftLive();
+
+    // Determine display state
+    const h = new Date().getHours();
+    const isDaytime = h >= DAY_BOUNDARY_HOUR && h < SHIFT_START_HOUR; // 9 AM – 9 PM
+
+    const fmtShift = new Date(shiftDate + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short' });
+
+    let stateLabel, tableTitle;
+    if (live) {
+      stateLabel  = ` &nbsp;<span style="color:#2e7d32;font-weight:700">● Live</span>`;
+      tableTitle  = 'Live Shift Attendance';
+    } else if (isDaytime) {
+      stateLabel  = ` &nbsp;<span style="color:#ef6c00;font-weight:600">Upcoming tonight</span>`;
+      tableTitle  = 'Last Shift Attendance';
+    } else {
+      stateLabel  = ` &nbsp;<span style="color:#4a5568">Completed</span>`;
+      tableTitle  = 'Last Shift Attendance';
+    }
+
+    document.getElementById('shiftDateLabel').innerHTML =
+      ` — Shift date: <strong>${fmtShift}</strong>${stateLabel}`;
+    document.getElementById('attTableTitle').textContent = tableTitle;
+
+    // Show auto-absent countdown during live shift, before 11 PM
+    if (live && h >= SHIFT_START_HOUR && h < AUTO_ABSENT_HOUR) {
+      const minsLeft = (AUTO_ABSENT_HOUR - h) * 60 - new Date().getMinutes();
+      document.getElementById('shiftDateLabel').innerHTML +=
+        ` &nbsp;·&nbsp; <span style="color:#c62828">Auto-absent in ~${minsLeft} min</span>`;
+    }
 
     try {
-      // Total staff
-      const { count: total } = await sb.from('staff').select('*', { count: 'exact', head: true });
+      /* 1 ── Load all staff */
+      const { data: allStaff, error: staffErr } = await sb
+        .from('staff').select('id, name, department, role').order('name');
+      if (staffErr) throw staffErr;
+      const total = allStaff.length;
 
-      // Today's attendance
-      const { data: todayAtt, error: attErr } = await sb
-        .from('attendance')
-        .select('*, staff(name, department)')
-        .eq('date', today);
-      if (attErr) throw attErr;
-
-      const present = todayAtt.filter(r => r.status === 'Present').length;
-      const absent  = todayAtt.filter(r => r.status === 'Absent').length;
-      const leave   = todayAtt.filter(r => r.status === 'Leave').length;
-      const pct     = total ? Math.round((present / total) * 100) : 0;
-
-      document.getElementById('statTotal').textContent   = total ?? 0;
-      document.getElementById('statPresent').textContent = present;
-      document.getElementById('statAbsent').textContent  = absent;
-      document.getElementById('statLeave').textContent   = leave;
-      document.getElementById('statPresentPct').textContent = total ? `${pct}% attendance rate` : 'No data yet';
-      document.getElementById('statAbsentPct').textContent  = total ? `${total - present} not marked present` : '';
-
-      // Today attendance table
-      const attBody = document.getElementById('todayAttBody');
-      if (!todayAtt.length) {
-        attBody.innerHTML = `<tr><td colspan="3" class="empty-state">No attendance marked today</td></tr>`;
-      } else {
-        attBody.innerHTML = todayAtt.slice(0, 8).map(r => `
-          <tr>
-            <td><strong>${r.staff?.name ?? '—'}</strong></td>
-            <td><span class="badge ${r.status.toLowerCase()}">${r.status}</span></td>
-            <td>${r.check_in || '—'}</td>
-          </tr>`).join('');
+      /* 2 ── Auto-absent (fire and check count) */
+      const autoCount = await runAutoAbsent(allStaff);
+      if (autoCount > 0) {
+        showToast(`Auto-marked ${autoCount} staff as absent for the previous shift.`, 'info');
       }
 
-      // Staff preview
-      const { data: staffList } = await sb.from('staff').select('name, department, role').limit(6);
+      /* 3 ── Load attendance for current shift date */
+      const { data: shiftAtt, error: attErr } = await sb
+        .from('attendance')
+        .select('*, staff(name, department)')
+        .eq('date', shiftDate)
+        .order('check_in', { ascending: true });
+      if (attErr) throw attErr;
+
+      const present = shiftAtt.filter(r => r.status === 'Present').length;
+      const absent  = shiftAtt.filter(r => r.status === 'Absent').length;
+      const leave   = shiftAtt.filter(r => r.status === 'Leave').length;
+      const pct     = total ? Math.round((present / total) * 100) : 0;
+
+      document.getElementById('statTotal').textContent      = total;
+      document.getElementById('statPresent').textContent    = present;
+      document.getElementById('statAbsent').textContent     = absent;
+      document.getElementById('statLeave').textContent      = leave;
+      document.getElementById('statPresentPct').textContent = total ? `${pct}% attendance rate` : 'No data yet';
+      document.getElementById('statAbsentPct').textContent  = total ? `${total - present - leave} not present` : '';
+
+      /* 4 ── Attendance table (with In / Out / Hours) */
+      const attBody = document.getElementById('todayAttBody');
+      if (!shiftAtt.length) {
+        attBody.innerHTML = `<tr><td colspan="5" class="empty-state">No attendance marked for this shift yet.</td></tr>`;
+      } else {
+        attBody.innerHTML = shiftAtt.map(r => {
+          const inTime  = toAmPm(r.check_in);
+          const outTime = toAmPm(r.check_out);
+          const hrs     = calcWorkingHours(r.check_in, r.check_out);
+
+          // Detect auto-absent source
+          const isAutoAbsent = r.source === 'auto' && r.status === 'Absent';
+          const statusBadge  = isAutoAbsent
+            ? `<span class="badge auto-absent">Auto Absent</span>`
+            : `<span class="badge ${r.status.toLowerCase()}">${r.status}</span>`;
+
+          const inCell  = inTime
+            ? `<span class="time-cell">${inTime}</span>`
+            : `<span class="time-cell dim">—</span>`;
+
+          const outCell = outTime
+            ? `<span class="time-cell">${outTime}</span>`
+            : (r.status === 'Present'
+                ? `<span class="time-cell dim">Active</span>`
+                : `<span class="time-cell dim">—</span>`);
+
+          const hrsCell = hrs
+            ? `<span class="hours-pill">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                ${hrs}
+               </span>`
+            : (r.check_in && !r.check_out && r.status === 'Present'
+                ? `<span class="hours-pending">In progress…</span>`
+                : `<span class="time-cell dim">—</span>`);
+
+          return `
+            <tr>
+              <td><strong>${r.staff?.name ?? '—'}</strong></td>
+              <td>${statusBadge}</td>
+              <td>${inCell}</td>
+              <td>${outCell}</td>
+              <td>${hrsCell}</td>
+            </tr>`;
+        }).join('');
+      }
+
+      /* 5 ── Staff overview */
       const staffBody = document.getElementById('staffPreviewBody');
-      if (!staffList?.length) {
+      if (!allStaff.length) {
         staffBody.innerHTML = `<tr><td colspan="3" class="empty-state">No staff added yet</td></tr>`;
       } else {
-        staffBody.innerHTML = staffList.map(s => `
+        staffBody.innerHTML = allStaff.slice(0, 7).map(s => `
           <tr>
             <td><strong>${s.name}</strong></td>
             <td>${s.department || '—'}</td>
             <td>${s.role || '—'}</td>
           </tr>`).join('');
       }
+
     } catch (err) {
       console.error(err);
-      showToast('Failed to load dashboard data: ' + (err.message || err), 'error');
+      showToast('Failed to load dashboard: ' + (err.message || err), 'error');
     }
   }
 </script>
