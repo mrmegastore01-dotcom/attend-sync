@@ -125,7 +125,7 @@
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
         </svg>
         <span>
-          <strong>Night Shift Mode</strong> — Shift: <strong>9:00 PM → 7:00 AM</strong> &nbsp;·&nbsp; Auto-absent fires at <strong>9:30 PM</strong> for no-shows &nbsp;·&nbsp; Dashboard resets at <strong>9:00 AM</strong>.
+          <strong>Night Shift Mode</strong> — Shift: <strong>9:00 PM → 7:00 AM</strong> &nbsp;·&nbsp; Auto-absent fires at <strong>11:00 PM</strong> for no-shows &nbsp;·&nbsp; Dashboard resets at <strong>9:00 AM</strong>.
           <span id="shiftDateLabel"></span>
         </span>
       </div>
@@ -252,7 +252,7 @@
      ─────────────────────────────────────────────────
      Shift window : 9 PM → 7 AM  (next calendar day)
      Late threshold: 9:15 PM  (21:15 PKT)
-     Auto-absent  : 9:30 PM  (21:30 PKT)
+     Auto-absent  : 11:00 PM  (21:30 PKT)
      Day boundary : 9 AM  (09:00 PKT)
        00:00–06:59 PKT → mid-shift (started last night)   → shiftDate = YESTERDAY
        07:00–08:59 PKT → shift just ended, still yesterday → shiftDate = YESTERDAY
@@ -261,8 +261,8 @@
 
   const SHIFT_START_HOUR  = 21;   // 9 PM  PKT
   const SHIFT_END_HOUR    =  7;   // 7 AM  PKT
-  const AUTO_ABSENT_HOUR  = 21;   // 9 PM  PKT
-  const AUTO_ABSENT_MIN   = 30;   // :30   → 9:30 PM
+  const AUTO_ABSENT_HOUR  = 23;   // 11 PM  PKT
+  const AUTO_ABSENT_MIN   = 1;   // :01   → 11:01 PM
   const LATE_HOUR         = 21;   // Late threshold: after 9:15 PM
   const LATE_MIN          = 15;
   const DAY_BOUNDARY_HOUR =  9;   // 9 AM  — admin view resets
@@ -305,7 +305,7 @@
     return h >= SHIFT_START_HOUR || h < SHIFT_END_HOUR;
   }
 
-  /** Returns true when past the auto-absent threshold (9:30 PM PKT) */
+  /** Returns true when past the auto-absent threshold (11:00 PM PKT) */
   function isPastAutoAbsentTime() {
     const pkt = nowPKT();
     const h = pkt.getHours(), m = pkt.getMinutes();
@@ -382,7 +382,7 @@
     const h   = pkt.getHours();
     let totalMarked = 0;
 
-    /* ── Tier 1: Current shift, past 9:30 PM threshold ── */
+    /* ── Tier 1: Current shift, past 11:00 PM threshold ── */
     if (isPastAutoAbsentTime()) {
       const currentShiftDate = getShiftDate(pkt);
       try {
@@ -394,7 +394,7 @@
           const absents = missing.map(s => ({
             staff_id: s.id, date: currentShiftDate, status: 'Absent',
             check_in: null, check_out: null,
-            notes: 'Auto-absent: did not check in by 9:30 PM', source: 'auto',
+            notes: 'Auto-absent: did not check in by 11:00 PM', source: 'auto',
           }));
           const { error } = await sb.from('attendance').upsert(absents, {
             onConflict: 'staff_id,date', ignoreDuplicates: true,
