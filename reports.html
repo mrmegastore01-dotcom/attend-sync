@@ -208,10 +208,14 @@
     document.getElementById('headerContainer').innerHTML  = renderHeader('Reports', 'Filter and export attendance records');
     document.getElementById('footerContainer').innerHTML  = renderFooter();
 
-    const now  = new Date();
-    const y    = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0');
+    // FIX: Use local date parts — toISOString() returns UTC midnight which
+    // can produce yesterday's date in UTC+ timezones like PKT (UTC+5)
+    const now = new Date();
+    const y   = now.getFullYear();
+    const m   = String(now.getMonth() + 1).padStart(2, '0');
+    const d   = String(now.getDate()).padStart(2, '0');
     document.getElementById('fromDate').value = `${y}-${m}-01`;
-    document.getElementById('toDate').value   = now.toISOString().slice(0,10);
+    document.getElementById('toDate').value   = `${y}-${m}-${d}`;
 
     await loadStaffOptions();
   })();

@@ -64,14 +64,28 @@ function showLoading(show = true) {
   }
 }
 
-/* ── Format date ─────────────────────────────────── */
+/* ── Format date ─────────────────────────────────────
+   FIX: new Date('YYYY-MM-DD') parses as UTC midnight.
+   In any UTC- timezone the date shifts back by one day.
+   We parse the parts manually to stay in local time.
+─────────────────────────────────────────────────── */
 function fmtDate(d) {
   if (!d) return '—';
-  return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  // Handle both 'YYYY-MM-DD' strings and full ISO timestamps
+  const dateStr = typeof d === 'string' ? d.slice(0, 10) : new Date(d).toISOString().slice(0, 10);
+  const [year, month, day] = dateStr.split('-').map(Number);
+  // Construct as local midnight — no UTC offset shift
+  return new Date(year, month - 1, day).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
+// FIX: toISOString() returns UTC midnight — in UTC+ timezones like PKT (UTC+5)
+// this can produce yesterday's date. Use local date parts instead.
 function todayISO() {
-  return new Date().toISOString().slice(0, 10);
+  const now = new Date();
+  const y   = now.getFullYear();
+  const m   = String(now.getMonth() + 1).padStart(2, '0');
+  const d   = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 /* ── Render sidebar active state ─────────────────── */
